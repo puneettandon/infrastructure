@@ -38,3 +38,88 @@ What is Docker Container?
 What is virtualization?
 
 -> Virtualization refers to the method of running a virtual version of a computer resource(hardware,software,etc) on the cloud.
+-> Also, a virtual machine(VM), is an isolated computing environment that allows developers to use an OS via a physical machine
+
+
+Benefits of Docker Containers
+
+-> No external dependencies
+-> Easily shipped(deployed) to other computer environments
+-> Data volumes are shared among multiple containers
+-> Shares the OS kernel with other containers
+
+
+Containerization vs Virtualization
+
+containerizationVsVirtualization.png
+containerization-docker-virtualzation.png
+
+-> In layman terms,
+    Virtual machine ( Bungalow) - Amenities(binary and library) cannot be shared with neighbours (applications)
+                                - cannot have multiple tenants (application)
+    Containers (Apartment) - Most amenities(binary and library) can be shared with neighbours
+                           - can have multiple tenants(Applications)
+
+
+Docker Containers
+    Data Volumes can be shared and reused among multiple containers
+    They have better performances as they are hosted in a single docker engine
+    High efficiency
+    It can multiple containers on a system
+    Easily portable across different platforms
+
+
+
+
+Virtual Machine
+    Data volumes cannot be shared
+    Running multiple virtual machines leads to unstable performance
+    Low efficiency
+    It can run only a limited number of VMs on a system
+    Compatibility issues while porting across different platforms
+
+
+
+
+Architecture of Docker
+
+Docker-Architecture.png
+-> Docker client is a service which uses rest api to send commands to a docker daemon through CLI commands
+-> Docker daemon checks the client request and communicates with the docker components in order to perform a service
+-> Docker image is a file of instructions which is used to create containers
+-> Docker container is a portable executable package which includes application and their dependencies
+-> Docker registry is a service used for hosting and distributing docker images among users
+
+
+How to create a Docker Container?
+-> Docker file creates a docker image (A docker file is a text file which contains commands for building a docker image)
+-> Docker image contains project's code
+-> With docker image, a user can run the code to create Docker Containers
+-> Once the docker image is created, it can be stored in the docker registry using docker push command (Docker push image name)
+-> Docker images are stored in a Docker Hub
+-> Multiple Docker images available in the registry
+-> A user can build new containers from Docker registry
+How to create Docker Container.png
+
+
+
+How Docker Containers Work?
+
+-> In Docker, a DockerFile is used to build the image using the build command and that image is stored into registry using push command
+-> When you run the pull command, Docker Image (NGINX) is retrieved from the registry
+-> Finally, a single container (NGINX) is built using Docker Image through the run command
+How Docker Containers work.png
+
+-> When a container is created, a new layer is formed on top of the Docker images layer called container layer
+-> Each container has separate (R/W) container layer and any changes made in a Docker Container is reflected upon the container layer
+-> In case a container is deleted, the container layer also gets deleted
+
+
+
+
+
+
+
+
+
+
