@@ -1,0 +1,40 @@
+Docker and Container  - simplilearn
+
+
+
+Why is Docker Container essential?
+
+-> Consider an example where a company develops an oracle weblogic software
+        A developer will setup an oracle weblogic software on his system
+        After the application is developed, it is examined by testing team
+               Here, the tester repeats the installation process of oracle weblogic
+        Once the application is tested,it will deployed by the production team
+                To host the java application,the system admin also must install oracle weblogic on his system
+
+
+        Why is the same weblogic installation done thrice?
+            Due to difference in computer environments, weblogic doesn't work on the other systems
+            So installation is done separately on three different computers
+            But this process consumes a lot of time and effort. Can there be alternative to this?
+
+        Why not try Docker Containers?
+
+
+What is Docker?
+
+-> Docker is an open source platform that help a user to package an application and its dependencies into docker container
+   for the development and deployment of software
+   docker1.png
+
+
+What is Docker Container?
+
+-> Containerization includes all the dependencies (framework,libraries etc) required to run an application in an efficient and bug-free manner.
+-> With Docker Containers, applications can work efficiently in different computer environments
+        Lightweight  --- Occupies less space   ---- Applications run in isolation
+        Secure    --- Portable --- Short boot-up time
+
+
+What is virtualization?
+
+-> Virtualization refers to the method of running a virtual version of a computer resource(hardware,software,etc) on the cloud.
