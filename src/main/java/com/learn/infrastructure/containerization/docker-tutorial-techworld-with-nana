@@ -1,0 +1,136 @@
+Docker Tutorial TechWorld - with - nana
+
+
+What is container ?
+A way to package application with all the necessary dependencies and configuration
+Portable artifact, easily shared and moved around
+Makes development and deployment more efficient
+
+
+Where do containers live?
+Some storage?
+Container Repository  - special type of storage for containers
+Private Repositories
+Public Repository for Docker
+
+
+How containers improved the development process?
+Earlier you have to install most of the services on your operating system directly.
+So if need any software example postgre and redis so every developer will install the binaries and configure on their local development
+environment and depending on which operating system they are using installation process will look different.
+Before Containers
+Application Development
+-> Installation process different on each OS environment
+-> Many steps where something could go wrong
+
+After containers
+Application Development
+You don't have to actually install any of the services directly on your operating system because the container is its own isolated
+operating system layer with linux based image
+
+-> Own isolated environment
+-> Packaged with all needed configuration
+-> one command to install the app
+-> run the same app with 2 different version
+
+
+Before Containers
+Application Deployment
+Development team will provide artifacts with set of instruction to install and configure those artifacts on the server
+So you would have jar file similar for your application
+
+Configuration on the server needed  ----> textual guide of deployment
+dependency version conflicts     ---> misunderstandings
+
+After Containers
+Developers and Operations work together to package the application in a container
+No environmental configuration needed on server ---> except Docker Runtime
+
+
+------------------------------------
+
+What is a container?
+
+---> Layer of images
+---> Mostly Linux based image , because small in size ( may be alpine)
+---> Application image on top
+
+
+Docker Image -
+image is the actual package
+artifact that can be moved around
+
+
+Docker Container
+when we pull the image on local machine and actually started the application -- container environment is created
+
+
+
+Docker vs Virtual Machines - Both are virtualization tools
+
+Docker on OS level
+
+Operating systems have 2 layers - 1. OS kernel   and 2.  Applications
+
+Docker virtualized application layer and uses the kernel of host
+VM has its own application layer and OS kernel - virtualize the complete OS
+
+
+
+Container vs Image
+Container is a running environment for image
+Container -> file system, environment configs, application image : postgres, redis, mongo, ...
+port binded: talk to application running inside of container
+virtual file system
+
+
+Docker Commands
+
+docker run hello-world   ----> run container (pulls image and start the container)
+
+docker pull redis    ----> pull image
+docker images
+docker run redis
+
+docker ps  ( running)
+docker ps -a  ( all containers whether running or not)
+docker run -d redis  ----> (detach mode)
+docker stop <container-id>
+docker start  <container-id>
+
+Container port vs Host port
+
+Multiple containers can run on your machine
+Your Laptop has only certain ports available
+Conflict when same port on host machine
+
+docker run -p6000:6739 redis
+docker run -p6001: 6379 redis:4.0
+
+docker logs <container-id>
+docker logs <container-name>
+
+docker run -d -p60002:6739 --name redis-older redis:4.0
+
+docker exec -it <containerId> /bin/bash  -----> enter docker file system  and check configuration
+ls
+exit
+
+docker exec -it <container-name> /bin/bash
+docker run ( to create a new container)
+docker start ( is to restart stop container)
+
+docker version
+
+docker run busybox
+docker run busybox echo hello harry
+docker run busybox ping codewithharry.com
+docker run busybox ls
+docker run busybox sh
+
+docker run = docker create + docker start
+create container + start container
+
+docker kill <container-id>
+
+docker
