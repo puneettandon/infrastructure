@@ -179,6 +179,274 @@ Docker Commands
     docker container port <container-id>
             provide port
 
+    docker container create <image-name>
+            docker container create ubuntu
+            only create container with this image
+
+    docker container start <container-id>
+            will start the container
+
+    docker image ls
+            list of images
+
+    docker container diff 615
+            whenever do any change in container
+
+    docker container -it ubuntu     /bin/bash/
+            open ubuntu terminal
+
+
+    watch 'docker container diff <container-id>'
+
+
+    copy files from local directory to docker container
+            docker container cp test/   <container-id>:/pathwheretocopy
+
+
+    docker container attach <container-id>
+
+---------------
+    docker container run -it ubuntu /bin/bash
+    apt-get update
+    apt-get install tree git -y                 ----> installing  tree and git in container
+
+    Exporting Docker container
+
+    docker container export <container-id> > my_ubuntu_tree_git.tar
+    docker container export <container-id> -o my_ubuntu_tree_git1.tar
+
+    Importing Image
+
+    docker image my_ubuntu_tree_git.tar my_ubuntu_t_g
+            will create new docker image from export thing
+
+
+    Create docker image from running container
+
+    docker container commit --author "puneet" -m "this is test commit" <container-id> my_test_image
+
+    docker container run -it my_test_image /bin/bash
+
+    can image this image to docker hub so anyone can download from there.
+
+    docker container rm -f <container-id>
+            stop and delete container
+
+-----------------------------------------
+    docker pull push tag
+
+    docker pull ubuntu:<version>
+    docker pull ubuntu:14.04
+
+
+    docker image tag <tag-name> hub.docker.com/<account-nam>/image-name
+    docker image tag my_ubuntu_t_g  hub.docker.com/puneettandon/my_ubuntu_t_g
+
+    docker push <account-name>/<image-name>
+    docker push puneettandon/my_ubuntu_t_g
+    docker login
+        provide username and password
+
+    docker pull puneettandon/my_ubutnu_t_g
+
+------------------------------------------------------
+
+    docker remove,inspect,list and history
+
+    docker image ls
+        will list docker images
+        docker images / docker image ls    ---> both are same
+
+    docker image ls --format '{{.ID}}, {{.Repository}}'
+          format accordingly
+
+    docker image history jenkins
+
+    docker image rm <image-name>
+            all unattached images will be removed
+
+    docker image rm -f <image-name>
+            forcefully remove image
+
+    docker rmi <image-name>
+            remove image shortcut
+
+
+    docker image inspect wordpress | less
+            detailed information of docker image
+
+    docker image prune
+            delete all unused images
+
+
+    docker image save <image-name>  > image.tar
+            will save the image
+            will put all images in tar if version not specified
+        docker image rm <image-name>
+        again load the save image ---tar file
+
+    docker image load < image.tar
+           load the image
+           name repository version all information
+
+    docker container export
+            will give tar file
+            create image of running container
+
+    docker image import
+            only single layer
+            of file system
+
+
+  ----------------------------------------------------------------------------------------------------------------------
+
+  Create Docker image using Docker Files
+
+
+   Default docker file name - Dockerfile
+   can be customized but need to mention your customized file name while building image
+    - f       -----> to specify file name
+
+    From <image-name>
+
+    docker image build -t myubuntu:1 .
+
+    docker container run -it myubuntu:1
+
+    vi Dockerfile
+
+    From ubuntu:16.04
+
+    vi Dockerfile
+
+     From ubuntu:16.04
+     Run apt-get update && apt-get install -y tree
+
+------
+    docker container run -it myubuntu:2
+    docker image build -t myubuntu:2 .
+
+    each line new layer
+
+-------
+
+    vi Dockerfile
+
+     From ubuntu:14.04
+     Run apt-get update && apt-get install -y tree
+     Run touch /tmp/1.txt
+     Run touch /tmp/2.txt
+     Run touch /tmp/3.txt
+     Run touch /tmp/4.txt
+     Run touch /tmp/5.txt
+     Run touch /tmp/6.txt
+
+---------
+
+    docker image build -t myubuntu:1 .
+
+    Layer architecture of Docker
+
+------------------------
+
+    vi Dockerfile
+
+     FROM ubuntu:14.04
+     LABEL name="puneet"
+     LABEL email="puneet@gmail.com"
+     ENV NAME puneet
+     ENV PASS password
+
+
+    Label -- to provide any kind of information ....will be available in inspect image
+    env --
+    docker image build -t myubuntu:10 .
+
+    docker image inspect myubuntu:10
+
+------------------------
+
+    vi Dockerfile
+
+         FROM ubuntu:14.04
+         RUN pwd>/tmp/1stpwd.txt
+         RUN cd /tmp/
+         RUN pwd>/2ndpwd.txt
+
+        to change the working dir
+
+         FROM ubuntu:14.04
+         RUN pwd>/tmp/1stpwd.txt
+         RUN cd /tmp/
+         RUN pwd>/2ndpwd.txt
+         WORKDIR /tmp
+         RUN pwd>/3rdpwd.txt
+
+------------------------
+
+
+    vi Dockerfile
+
+        FROM ubuntu:14.04
+        ENV NAME puneet
+        ENV PASS password
+        RUN useradd -d /home/puneet -g root -G sudo -m -p  $(echo "$PASS" | openssl  passwd -l -stdin) $NAME
+        RUN whoami   > /tmp/Istwhoami.txt
+        USER $NAME
+        RUN whoami   > /tmp/2ndwhoami.txt
+
+        build the image and check how to switch user from above commands
+
+
+------------------------------------
+
+    vi Dockerfile
+
+        FROM ubuntu:14.04
+        RUN mkdir -p /tmp/project
+        COPY testProject /tmp/project
+
+        build the image and check whether new dir is created and file copied from one location to another
+
+
+
+        FROM ubuntu:14.04
+        RUN mkdir -p /tmp/project
+        ADD testProject /tmp/project
+
+        copy commands copy fully  tar file
+        but Add command extracts the content and copy it .
+------------------------------------------
+
+
+     FROM ubuntu:14.04
+     CMD ["python"]
+
+     CMD can be only one in one file
+     If multiple then last will be considered
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
