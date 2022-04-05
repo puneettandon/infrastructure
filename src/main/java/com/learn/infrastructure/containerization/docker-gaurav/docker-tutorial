@@ -426,6 +426,57 @@ Docker Commands
      If multiple then last will be considered
 
 
+----------------------------------------------
+
+    SSH Server and EXPOSE
+
+
+     FROM ubuntu:14.04
+     FROM ubuntu:14.04
+     ENV NAME puneet
+     ENV PASS password
+     RUN useradd -d /home/puneet -g root -G sudo -m -p  $(echo "$PASS" | openssl  passwd -l -stdin) $NAME
+     USER $NAME
+     CMD ["/usr/sbin/sshd","-D"]
+
+
+     ssh puneet@<ip-address>
+     ip-address can be get from inspect
+
+     Expose some specific port for this container
+
+     EXPOSE 22
+
+     SSH run on port 22.
+
+
+     ssh puneet@192.0.0.1. -p 22323
+     it will be directed to port 22 in container from local port
+
+
+     for multiple expose
+     EXPOSE 22  80
+
+ ----------------------------------------
+
+    ENTRYPOINT
+
+    FROM ubuntu:14.04
+    RUN apt-get install -y python tree
+    ENTRYPOINT ["tree"]
+    CMD ["--version"]
+
+
+    FROM ubuntu:14.04
+    COPY test.sh /tmp
+    ENTRYPOINT ["/tmp/test.sh"]
+
+
+
+
+
+
+
 
 
 
