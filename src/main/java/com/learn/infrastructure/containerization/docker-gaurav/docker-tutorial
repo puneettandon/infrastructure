@@ -472,6 +472,50 @@ Docker Commands
     ENTRYPOINT ["/tmp/test.sh"]
 
 
+-----------------------------------------------------------------------------------------------------------------------
+
+Docker Volume
+
+
+in tmp folder if we create directory , if we delete container then that tmp will also be deleted.
+
+How to persist data in container?
+
+ using volume
+ using bind mount
+
+
+ docker volume ls
+ docker inspect and check volume
+
+ mount inside /var/lib/mysql
+
+ run mysql container
+
+
+ cd /var/lib/docker/volumes/<volume-id>
+
+docker container exec -it 749 bash
+
+create database puneet
+
+create database test
+
+delete docker container
+docker container rm -f <container-id>
+
+again create container
+and now no databases will be there so data is lost
+
+Attach volume of existing container
+
+docker container run -itd -v <volume-name>:/var/lib/mysql mysql
+
+ docker container run -d --name xyz_com_database -v abc:/var/lib/mysql -e MYSQL_ALLOW_EMPTY_PASSWORD=true mysql
+ automatically creates and mounts volume abc
+
+
+
 
 
 
