@@ -1,0 +1,76 @@
+Reindexing
+
+
+PUT /source_index_1
+				{
+				  "settings": {"number_of_replicas": 0, "number_of_shards": 1},
+				  "mappings": {"_source": {"enabled": true}}
+				}
+				
+PUT source_index_1/_bulk
+  { "create" : { "_index" : "source_index_1", "_id" : "1" } }
+  { "name":"Vivek", "country": "Australia" }
+  { "create" : { "_index" : "source_index_1", "_id" : "2" } }
+  { "name":"Abhinav","country": "India" }
+  { "create" : { "_index" : "source_index_1", "_id" : "3" } }
+  { "name":"Ritvik","country": "India" }
+  { "create" : { "_index" : "source_index_1", "_id" : "4" } }
+  { "name":"Ajay","country": "China" }
+  { "create" : { "_index" : "source_index_1", "_id" : "5" } }
+  { "name":"Amar","country": "India" }
+
+
+GET source_index_1/_search
+
+
+	
+PUT /destination_index_1
+{
+	"settings": {"number_of_replicas": 0, "number_of_shards": 1},
+	"mappings": {"_source": {"enabled": true}}
+}
+
+GET /source_index/_settings
+
+GET
+
+POST _reindex
+{
+   "source": {  "index": "source_index_1"},
+		"dest": { "index": "destination_index_1"  }
+}
+
+
+GET destination_index_1/_search
+
+
+
+---------------------------------------------------------------------
+
+Alias
+
+
+POST /_aliases
+{
+				  "actions": [
+				    {
+				      "remove": {
+				        "index": "source_index_1",
+				        "alias": "source_index"
+				      }
+				    }
+				  ]
+				}
+
+
+				POST /_aliases
+				{
+				  "actions": [
+				    {
+				      "add": {
+				        "index": "source_index_2",
+				        "alias": "source_index_2_alias"
+				      }
+				    }
+				  ]
+				}

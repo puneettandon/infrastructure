@@ -1,0 +1,1718 @@
+
+
+
+
+			Document API
+
+				Index API 
+					PUT schools/_doc/5
+						{
+						   name":"City School", "description":"ICSE", "street":"West End",
+						   "city":"Meerut",
+						   "state":"UP", "zip":"250002", "location":[28.9926174, 77.692485],
+						   "fees":3500,
+						   "tags":["fully computerized"], "rating":"4.5"
+						}
+						-----------------------
+						{
+						   "_index" : "schools",
+						   "_type" : "_doc",
+						   "_id" : "5",
+						   "_version" : 1,
+						   "result" : "created",
+						   "_shards" : {
+						      "total" : 2,
+						      "successful" : 1,
+						      "failed" : 0
+						   },
+						   "_seq_no" : 2,
+						   "_primary_term" : 1
+						}
+
+
+					Automatic Index Creation
+						action.auto_create_index:false
+						index.mapper.dynamic:false
+						action.auto_create_index:+acc*,-bank*
+
+
+
+					Automatic ID generation
+						POST chapter/_doc/
+						{
+						   "user" : "tpoint",
+						   "post_date" : "2018-12-25T14:12:12",
+						   "message" : "Elasticsearch Tutorial"
+						}
+	
+
+
+				GET API
+					GET schools/_doc/5
+					----------------------
+					{
+					   "_index" : "schools",
+					   "_type" : "_doc",
+					   "_id" : "5",
+					   "_version" : 7,
+					   "_seq_no" : 3,
+					   "_primary_term" : 1,
+					   "found" : true,
+					   "_source" : {
+					      "name" : "Central School",
+					      "description" : "CBSE Affiliation",
+					      "street" : "Nagan",
+					      "city" : "paprola",
+					      "state" : "HP",
+					      "zip" : "176115",
+					      "location" : [
+					         31.8955385,
+					         76.8380405
+					      ],
+					      "fees" : 2200,
+					      "tags" : [
+					         "Senior Secondary",
+					         "beautiful campus"
+					      ],
+					      "rating" : "3.3"
+					   }
+					}
+
+				--------------------------------------------------------------------
+
+					GET schools/_doc/5?_source_includes=name,fees 
+					----------------------------
+					{
+					   "_index" : "schools",
+					   "_type" : "_doc",
+					   "_id" : "5",
+					   "_version" : 7,
+					   "_seq_no" : 3,
+					   "_primary_term" : 1,
+					   "found" : true,
+					   "_source" : {
+					      "fees" : 2200,
+					      "name" : "Central School"
+					   }
+					} 
+
+
+
+
+				DELETE API
+					DELETE schools/_doc/4  
+					------------------------
+					{
+					   "found":true, "_index":"schools", "_type":"school", "_id":"4", "_version":2,
+					   "_shards":{"total":2, "successful":1, "failed":0}
+					}
+
+
+
+				UPDATE API
+					Script is used for performing this operation and versioning is used to make sure that no updates have happened during the get and re-index. 
+					For example, you can update the fees of school using script −
+					POST schools/_update/4
+					{
+					   "script" : {
+					      "source": "ctx._source.name = params.sname",
+					      "lang": "painless",
+					      "params" : {
+					         "sname" : "City Wise School"
+					      }
+					   }
+					}
+					--------------------------------------
+					{
+					   "_index" : "schools",
+					   "_type" : "_doc",
+					   "_id" : "4",
+					   "_version" : 3,
+					   "result" : "updated",
+					   "_shards" : {
+					      "total" : 2,
+					      "successful" : 1,
+					      "failed" : 0
+					   },
+					   "_seq_no" : 4,
+					   "_primary_term" : 2
+					}
+
+
+
+=============================================================================================================================================================================================================================
+
+
+
+
+
+		SEARCH APIs
+
+			Multi-Index
+				GET /_all/_search?q=city:paprola
+				--------------------------------------
+				{
+				   "took" : 33,
+				   "timed_out" : false,
+				   "_shards" : {
+				      "total" : 7,
+				      "successful" : 7,
+				      "skipped" : 0,
+				      "failed" : 0
+				   },
+				   "hits" : {
+				      "total" : {
+				         "value" : 1,
+				         "relation" : "eq"
+				      },
+				      "max_score" : 0.9808292,
+				      "hits" : [
+				         {
+				            "_index" : "schools",
+				            "_type" : "school",
+				            "_id" : "5",
+				            "_score" : 0.9808292,
+				            "_source" : {
+				               "name" : "Central School",
+				               "description" : "CBSE Affiliation",
+				               "street" : "Nagan",
+				               "city" : "paprola",
+				               "state" : "HP",
+				               "zip" : "176115",
+				               "location" : [
+				                  31.8955385,
+				                  76.8380405
+				               ],
+				               "fees" : 2200,
+				               "tags" : [
+				                  "Senior Secondary",
+				                  "beautiful campus"
+				               ],
+				               "rating" : "3.3"
+				            }
+				         }
+				      ]
+				   }
+				}
+
+
+
+				URI Search
+
+					Q - This parameter is used to specify query string.
+					lenient - This parameter is used to specify query string.Format based errors can be ignored by just setting this parameter to true. It is false by default.
+					fields - This parameter is used to specify query string.
+					sort - We can get sorted result by using this parameter, the possible values for this parameter is fieldName, fieldName:asc/fieldname:desc
+					timeout - We can restrict the search time by using this parameter and response only contains the hits in that specified time. By default, there is no timeout.
+					terminate_after - We can restrict the response to a specified number of documents for each shard, upon reaching which the query will terminate early. By default, there is no terminate_after.
+					from - The starting from index of the hits to return. Defaults to 0.
+					size - It denotes the number of hits to return. Defaults to 10.
+
+
+
+
+				Request Body Search 
+					POST /schools/_search
+					{
+					   "query":{
+					      "query_string":{
+					         "query":"up"
+					      }
+					   }
+					}
+					----------------------------------
+					{
+					   "took" : 11,
+					   "timed_out" : false,
+					   "_shards" : {
+					      "total" : 1,
+					      "successful" : 1,
+					      "skipped" : 0,
+					      "failed" : 0
+					   },
+					   "hits" : {
+					      "total" : {
+					         "value" : 1,
+					         "relation" : "eq"
+					      },
+					      "max_score" : 0.47000363,
+					      "hits" : [
+					         {
+					            "_index" : "schools",
+					            "_type" : "school",
+					            "_id" : "4",
+					            "_score" : 0.47000363,
+					            "_source" : {
+					               "name" : "City Best School",
+					               "description" : "ICSE",
+					               "street" : "West End",
+					               "city" : "Meerut",
+					               "state" : "UP",
+					               "zip" : "250002",
+					               "location" : [
+					                  28.9926174,
+					                  77.692485
+					               ],
+					               "fees" : 3500,
+					               "tags" : [
+					                  "fully computerized"
+					               ],
+					               "rating" : "4.5"
+					            }
+					         }
+					      ]
+					   }
+					}
+
+
+
+=============================================================================================================================================================================================================================
+
+
+			
+			Aggregations
+
+
+				Avg Aggregation
+				POST /schools/_search
+				{
+				   "aggs":{
+				      "avg_fees":{"avg":{"field":"fees"}}
+				   }
+				}
+				-----------------------------------------
+
+				{
+				   "took" : 41,
+				   "timed_out" : false,
+				   "_shards" : {
+				      "total" : 1,
+				      "successful" : 1,
+				      "skipped" : 0,
+				      "failed" : 0
+				   },
+				   "hits" : {
+				      "total" : {
+				         "value" : 2,
+				         "relation" : "eq"
+				      },
+				      "max_score" : 1.0,
+				      "hits" : [
+				         {
+				            "_index" : "schools",
+				            "_type" : "school",
+				            "_id" : "5",
+				            "_score" : 1.0,
+				            "_source" : {
+				               "name" : "Central School",
+				               "description" : "CBSE Affiliation",
+				               "street" : "Nagan",
+				               "city" : "paprola",
+				               "state" : "HP",
+				               "zip" : "176115",
+				               "location" : [
+				                  31.8955385,
+				                  76.8380405
+				               ],
+				            "fees" : 2200,
+				            "tags" : [
+				               "Senior Secondary",
+				               "beautiful campus"
+				            ],
+				            "rating" : "3.3"
+				         }
+				      },
+				      {
+				         "_index" : "schools",
+				         "_type" : "school",
+				         "_id" : "4",
+				         "_score" : 1.0,
+				         "_source" : {
+				            "name" : "City Best School",
+				            "description" : "ICSE",
+				            "street" : "West End",
+				            "city" : "Meerut",
+				            "state" : "UP",
+				            "zip" : "250002",
+				            "location" : [
+				               28.9926174,
+				               77.692485
+				            ],
+				            "fees" : 3500,
+				            "tags" : [
+				               "fully computerized"
+				            ],
+				            "rating" : "4.5"
+				         }
+				      }
+				   ]
+				 },
+				   "aggregations" : {
+				      "avg_fees" : {
+				         "value" : 2850.0
+				      }
+				   }
+				}
+
+
+
+
+			POST /schools/_search?size=0
+			{
+			   "aggs":{
+			      "distinct_name_count":{"cardinality":{"field":"fees"}}
+			   }
+			}
+			----------------------------------------------
+			{
+			   "took" : 2,
+			   "timed_out" : false,
+			   "_shards" : {
+			      "total" : 1,
+			      "successful" : 1,
+			      "skipped" : 0,
+			      "failed" : 0
+			   },
+			   "hits" : {
+			      "total" : {
+			         "value" : 2,
+			         "relation" : "eq"
+			      },
+			      "max_score" : null,
+			      "hits" : [ ]
+			   },
+			   "aggregations" : {
+			      "distinct_name_count" : {
+			         "value" : 2
+			      }
+			   }
+			}
+
+			Max Aggregation
+			POST /schools/_search?size=0
+			{
+			   "aggs" : {
+			   "max_fees" : { "max" : { "field" : "fees" } }
+			   }
+			}
+
+
+			Min Aggregation
+			POST /schools/_search?size=0
+			{
+			   "aggs" : {
+			      "min_fees" : { "min" : { "field" : "fees" } }
+			   }
+			}
+
+
+			Sum Aggregation
+			POST /schools/_search?size=0
+			{
+			   "aggs" : {
+			      "total_fees" : { "sum" : { "field" : "fees" } }
+			   }
+			}
+
+
+=========================================================================================================================================================================================================
+
+
+
+		INDEX APIs
+
+
+			Create Index
+
+				PUT colleges
+				--------------------------
+				{
+				   "acknowledged" : true,
+				   "shards_acknowledged" : true,
+				   "index" : "colleges"
+				}
+
+
+				PUT colleges
+				{
+				  "settings" : {
+				      "index" : {
+				         "number_of_shards" : 3,
+				         "number_of_replicas" : 2
+				      }
+				   }
+				}
+				-----------------------------------------------
+				{
+				   "acknowledged" : true,
+				   "shards_acknowledged" : true,
+				   "index" : "colleges"
+				}
+
+
+
+			Delete Index
+
+				DELETE /colleges
+
+				You can delete all indices by just using _all or *.
+
+
+			GET colleges
+			-----------------------------------------------
+			{
+			   "colleges" : {
+			      "settings" : {
+			         "index" : {
+			            "creation_date" : "1556245406616",
+			            "number_of_shards" : "1",
+			            "number_of_replicas" : "1",
+			            "uuid" : "3ExJbdl2R1qDLssIkwDAug",
+			            "version" : {
+			               "created" : "7000099"
+			            },
+			            "provided_name" : "colleges"
+			         }
+			      }
+			   }
+			}
+
+
+		Index Stats
+
+			GET /_stats
+			-----------------------------
+			………………………………………………
+			},
+			   "request_cache" : {
+			      "memory_size_in_bytes" : 849,
+			      "evictions" : 0,
+			      "hit_count" : 1171,
+			      "miss_count" : 4
+			   },
+			   "recovery" : {
+			      "current_as_source" : 0,
+			      "current_as_target" : 0,
+			      "throttle_time_in_millis" : 0
+			   }
+			} ………………………………………………
+
+
+			POST colleges/_flush
+			--------------------------------------
+			{
+			   "_shards" : {
+			      "total" : 2,
+			      "successful" : 1,
+			      "failed" : 0
+			   } 
+			}
+
+
+
+======================================================================================================================================================================================================
+
+
+		Cluster APIs
+
+			The cluster API is used for getting information about cluster and its nodes and to make changes in them. 
+			To call this API, we need to specify the node name, address or _local.
+
+
+
+			GET /_nodes/_local
+			---------------------------------
+
+			………………………………………………
+			cluster_name" : "elasticsearch",
+			   "nodes" : {
+			      "FKH-5blYTJmff2rJ_lQOCg" : {
+			         "name" : "ubuntu",
+			         "transport_address" : "127.0.0.1:9300",
+			         "host" : "127.0.0.1",
+			         "ip" : "127.0.0.1",
+			         "version" : "7.0.0",
+			         "build_flavor" : "default",
+			         "build_type" : "tar",
+			         "build_hash" : "b7e28a7",
+			         "total_indexing_buffer" : 106502553,
+			         "roles" : [
+			            "master",
+			            "data",
+			            "ingest"
+			         ],
+			         "attributes" : {
+			………………………………………………
+
+
+			Cluster Health
+
+				GET /_cluster/health
+				-------------------------------
+				{
+				   "cluster_name" : "elasticsearch",
+				   "status" : "yellow",
+				   "timed_out" : false,
+				   "number_of_nodes" : 1,
+				   "number_of_data_nodes" : 1,
+				   "active_primary_shards" : 7,
+				   "active_shards" : 7,
+				   "relocating_shards" : 0,
+				   "initializing_shards" : 0,
+				   "unassigned_shards" : 4,
+				   "delayed_unassigned_shards" : 0,
+				   "number_of_pending_tasks" : 0,
+				   "number_of_in_flight_fetch" : 0,
+				   "task_max_waiting_in_queue_millis" : 0,
+				   "active_shards_percent_as_number" : 63.63636363636363
+				}
+
+
+			Cluster State
+
+				GET /_cluster/state
+				---------------------------------
+				………………………………………………
+				{
+				   "cluster_name" : "elasticsearch",
+				   "cluster_uuid" : "IzKu0OoVTQ6LxqONJnN2eQ",
+				   "version" : 89,
+				   "state_uuid" : "y3BlwvspR1eUQBTo0aBjig",
+				   "master_node" : "FKH-5blYTJmff2rJ_lQOCg",
+				   "blocks" : { },
+				   "nodes" : {
+				      "FKH-5blYTJmff2rJ_lQOCg" : {
+				      "name" : "ubuntu",
+				      "ephemeral_id" : "426kTGpITGixhEzaM-5Qyg",
+				      "transport
+				   }
+				………………………………………………
+
+
+		
+==================================================================================================================================================================
+
+
+
+	
+	Query DSL
+		In Elasticsearch, searching is carried out by using query based on JSON. A query is made up of two clauses −
+			Leaf Query Clauses −  These clauses are match, term or range, which look for a specific value in specific field.
+			Compound Query Clauses − These queries are a combination of leaf query clauses and other compound queries to extract the desired information.
+
+			Match All Query
+
+			POST /schools/_search
+			{
+			   "query":{
+			      "match_all":{}
+			   }
+			}		
+
+			------------------------------------------
+			{
+			   "took" : 7,
+			   "timed_out" : false,
+			   "_shards" : {
+			      "total" : 1,
+			      "successful" : 1,
+			      "skipped" : 0,
+			      "failed" : 0
+			   },
+			   "hits" : {
+			      "total" : {
+			         "value" : 2,
+			         "relation" : "eq"
+			      },
+			      "max_score" : 1.0,
+			      "hits" : [
+			         {
+			            "_index" : "schools",
+			            "_type" : "school",
+			            "_id" : "5",
+			            "_score" : 1.0,
+			            "_source" : {
+			               "name" : "Central School",
+			               "description" : "CBSE Affiliation",
+			               "street" : "Nagan",
+			               "city" : "paprola",
+			               "state" : "HP",
+			               "zip" : "176115",
+			               "location" : [
+			                  31.8955385,
+			                  76.8380405
+			               ],
+			               "fees" : 2200,
+			               "tags" : [
+			                  "Senior Secondary",
+			                  "beautiful campus"
+			               ],
+			               "rating" : "3.3"
+			            }
+			         },
+			         {
+			            "_index" : "schools",
+			            "_type" : "school",
+			            "_id" : "4",
+			            "_score" : 1.0,
+			            "_source" : {
+			               "name" : "City Best School",
+			               "description" : "ICSE",
+			               "street" : "West End",
+			               "city" : "Meerut",
+			               "state" : "UP",
+			               "zip" : "250002",
+			               "location" : [
+			                  28.9926174,
+			                  77.692485
+			               ],
+			               "fees" : 3500,
+			               "tags" : [
+			                  "fully computerized"
+			               ],
+			               "rating" : "4.5"
+			            }
+			         }
+			      ]
+			   }
+			}
+
+
+			Full Text Queries
+
+			These queries are used to search a full body of text like a chapter or a news article.
+			This query works according to the analyser associated with that particular index or document.
+
+
+			Match query
+			This query matches a text or phrase with the values of one or more fields.
+
+			POST /schools*/_search
+			{
+			   "query":{
+			      "match" : {
+			         "rating":"4.5"
+			      }
+			   }
+			}
+			--------------------------------------------
+			{
+			   "took" : 44,
+			   "timed_out" : false,
+			   "_shards" : {
+			      "total" : 1,
+			      "successful" : 1,
+			      "skipped" : 0,
+			      "failed" : 0
+			   },
+			   "hits" : {
+			      "total" : {
+			         "value" : 1,
+			         "relation" : "eq"
+			      },
+			      "max_score" : 0.47000363,
+			      "hits" : [
+			         {
+			            "_index" : "schools",
+			            "_type" : "school",
+			            "_id" : "4",
+			            "_score" : 0.47000363,
+			            "_source" : {
+			               "name" : "City Best School",
+			               "description" : "ICSE",
+			               "street" : "West End",
+			               "city" : "Meerut",
+			               "state" : "UP",
+			               "zip" : "250002",
+			               "location" : [
+			                  28.9926174,
+			                  77.692485
+			               ],
+			               "fees" : 3500,
+			               "tags" : [
+			                  "fully computerized"
+			               ],
+			               "rating" : "4.5"
+			            }
+			         }
+			      ]
+			   }
+			}
+
+
+
+		Multi Match Query
+		This query matches a text or phrase with more than one field.
+
+		POST /schools*/_search
+		{
+		   "query":{
+		      "multi_match" : {
+		         "query": "paprola",
+		         "fields": [ "city", "state" ]
+		      }
+		   }
+		}
+		-------------------------------------------------
+
+		{
+		   "took" : 12,
+		   "timed_out" : false,
+		   "_shards" : {
+		      "total" : 1,
+		      "successful" : 1,
+		      "skipped" : 0,
+		      "failed" : 0
+		   },
+		   "hits" : {
+		      "total" : {
+		         "value" : 1,
+		         "relation" : "eq"
+		      },
+		      "max_score" : 0.9808292,
+		      "hits" : [
+		         {
+		            "_index" : "schools",
+		            "_type" : "school",
+		            "_id" : "5",
+		            "_score" : 0.9808292,
+		            "_source" : {
+		               "name" : "Central School",
+		               "description" : "CBSE Affiliation",
+		               "street" : "Nagan",
+		               "city" : "paprola",
+		               "state" : "HP",
+		               "zip" : "176115",
+		               "location" : [
+		                  31.8955385,
+		                  76.8380405
+		               ],
+		               "fees" : 2200,
+		               "tags" : [
+		                  "Senior Secondary",
+		                  "beautiful campus"
+		               ],
+		               "rating" : "3.3"
+		            }
+		         }
+		      ]
+		   }
+		}
+
+
+		Query String Query
+		This query uses query parser and query_string keyword.
+		POST /schools*/_search
+		{
+		   "query":{
+		      "query_string":{
+		         "query":"beautiful"
+		      }
+		   }
+		}  
+		-----------------------------------
+		{
+  		   "took" : 60,
+		   "timed_out" : false,
+		   "_shards" : {
+		      "total" : 1,
+		      "successful" : 1,
+		      "skipped" : 0,
+		      "failed" : 0
+		   },
+		   "hits" : {
+		      "total" : {
+		      "value" : 1,
+		      "relation" : "eq"
+		   },
+		………………………………….
+
+
+
+
+		Term Level Queries
+		These queries mainly deal with structured data like numbers, dates and enums.
+
+		POST /schools*/_search
+		{
+		   "query":{
+		      "term":{"zip":"176115"}
+		   }
+		}
+		-----------------------------------------------
+		……………………………..
+		hits" : [
+		   {
+		      "_index" : "schools",
+		      "_type" : "school",
+		      "_id" : "5",
+		      "_score" : 0.9808292,
+		      "_source" : {
+		         "name" : "Central School",
+		         "description" : "CBSE Affiliation",
+		         "street" : "Nagan",
+		         "city" : "paprola",
+		         "state" : "HP",
+		         "zip" : "176115",
+		         "location" : [
+		            31.8955385,
+		            76.8380405
+		         ],
+		      }
+		   }
+		]   
+		…………………………………………..
+
+
+		Range Query
+		This query is used to find the objects having values between the ranges of values given. For this, we need to use operators such as −
+
+		gte − greater than equal to
+		gt − greater-than
+		lte − less-than equal to
+		lt − less-than
+
+
+		POST /schools*/_search
+		{
+		   "query":{
+		      "range":{
+		         "rating":{
+		            "gte":3.5
+		         }
+		      }
+		   }
+		}
+
+		----------------------------------
+		{
+		   "took" : 24,
+		   "timed_out" : false,
+		   "_shards" : {
+		      "total" : 1,
+		      "successful" : 1,
+		      "skipped" : 0,
+		      "failed" : 0
+		   },
+		   "hits" : {
+		      "total" : {
+		         "value" : 1,
+		         "relation" : "eq"
+		      },
+		      "max_score" : 1.0,
+		      "hits" : [
+		         {
+		            "_index" : "schools",
+		            "_type" : "school",
+		            "_id" : "4",
+		            "_score" : 1.0,
+		            "_source" : {
+		               "name" : "City Best School",
+		               "description" : "ICSE",
+		               "street" : "West End",
+		               "city" : "Meerut",
+		               "state" : "UP",
+		               "zip" : "250002",
+		               "location" : [
+		                  28.9926174,
+		                  77.692485
+		               ],
+		               "fees" : 3500,
+		               "tags" : [
+		                  "fully computerized"
+		               ],
+		               "rating" : "4.5"
+		            }
+		         }
+		      ]
+		   }
+		}
+
+
+
+		There exist other types of term level queries also such as −
+			Exists query − If a certain field has non null value.
+			Missing query − This is completely opposite to exists query, this query searches for objects without specific fields or fields having null value.
+			Wildcard or regexp query − This query uses regular expressions to find patterns in the objects.
+
+
+
+
+		Compound Queries
+		These queries are a collection of different queries merged with each other by using Boolean operators like and, or, not or for different indices or having function calls etc.
+
+		POST /schools/_search
+		{
+		   "query": {
+		      "bool" : {
+		         "must" : {
+		            "term" : { "state" : "UP" }
+		         },
+		         "filter": {
+		            "term" : { "fees" : "2200" }
+		         },
+		         "minimum_should_match" : 1,
+		         "boost" : 1.0
+		      }
+		   }
+		}
+		------------------------------------------------------------------
+		{
+		   "took" : 6,
+		   "timed_out" : false,
+		   "_shards" : {
+		      "total" : 1,
+		      "successful" : 1,
+		      "skipped" : 0,
+		      "failed" : 0
+		   },
+		   "hits" : {
+		      "total" : {
+		         "value" : 0,
+		         "relation" : "eq"
+		      },
+		      "max_score" : null,
+		      "hits" : [ ]
+		   }
+		}
+
+
+
+		Geo Queries
+		These queries deal with geo locations and geo points.
+		These queries help to find out schools or any other geographical object near to any location. You need to use geo point data type.
+		PUT /geo_example
+		{
+		   "mappings": {
+		      "properties": {
+		         "location": {
+		            "type": "geo_shape"
+		         }
+		      }
+		   }
+		}
+		-------------------------------------------------------
+		{  "acknowledged" : true,
+		   "shards_acknowledged" : true,
+		   "index" : "geo_example"
+		}
+
+
+============================================================================================================================================================================
+
+
+
+	Mapping
+
+		Mapping is the outline of the documents stored in an index.
+		It defines the data type like geo_point or string and format of the fields present in the documents and rules to control the mapping of dynamically added fields.
+
+		PUT bankaccountdetails
+		{
+		   "mappings":{
+		      "properties":{
+		         "name": { "type":"text"}, "date":{ "type":"date"},
+		         "balance":{ "type":"double"}, "liability":{ "type":"double"}
+		      }
+		   }
+		 }
+
+
+		 {
+		   "acknowledged" : true,
+		   "shards_acknowledged" : true,
+		   "index" : "bankaccountdetails"
+		}
+
+		Field Data Types
+		Elasticsearch supports a number of different datatypes for the fields in a document.
+
+		Core Data Types - These are the basic data types such as text, keyword, date, long, double, boolean or ip, which are supported by almost all the systems.
+		Complex Data Types - These data types are a combination of core data types. These include array, JSON object and nested data type.
+
+		POST /tabletennis/_doc/1
+		{
+		   "group" : "players",
+		   "user" : [
+		      {
+		         "first" : "dave", "last" : "jones"
+		      },
+		      {
+		         "first" : "kevin", "last" : "morris"
+		      }
+		   ]
+		}
+		-----------------------------------------------------------
+		{
+		   "_index" : "tabletennis",
+		   "_type" : "_doc",
+		   "_id" : "1",
+		   _version" : 2,
+		   "result" : "updated",
+		   "_shards" : {
+		      "total" : 2,
+		      "successful" : 1,
+		      "failed" : 0
+		   },
+		   "_seq_no" : 1,
+		   "_primary_term" : 1
+		}
+
+
+		Removal of Mapping Types
+			Indices created in Elasticsearch 7.0.0 or later no longer accept a _default_ mapping.
+			Indices created in 6.x will continue to function as before in Elasticsearch 6.x. Types are deprecated in APIs in 7.0.
+
+
+
+====================================================================================================================================================================================
+
+
+
+		Elasticsearch - Analysis
+
+		When a query is processed during a search operation, the content in any index is analyzed by the analysis module.
+		This module consists of analyzer, tokenizer, tokenfilters and charfilters.
+		If no analyzer is defined, then by default the built in analyzers, token, filters and tokenizers get registered with analysis module.
+
+		POST _analyze
+		{
+		   "analyzer": "standard",
+		   "text": "Today's weather is beautiful"
+		}
+		----------------------------------------------
+		{
+		   "tokens" : [
+		      {
+		         "token" : "today's",
+		         "start_offset" : 0,
+		         "end_offset" : 7,
+		         "type" : "",
+		         "position" : 0
+		      },
+		      {
+		         "token" : "weather",
+		         "start_offset" : 8,
+		         "end_offset" : 15,
+		         "type" : "",
+		         "position" : 1
+		      },
+		      {
+		         "token" : "is",
+		         "start_offset" : 16,
+		         "end_offset" : 18,
+		         "type" : "",
+		         "position" : 2
+		      },
+		      {
+		         "token" : "beautiful",
+		         "start_offset" : 19,
+		         "end_offset" : 28,
+		         "type" : "",
+		         "position" : 3
+		      }
+		   ]
+		}
+
+		Configuring the Standard analyzer
+		We can configure the standard analyser with various parameters to get our custom requirements.
+
+		PUT index_4_analysis
+		{
+		   "settings": {
+		      "analysis": {
+		         "analyzer": {
+		            "my_english_analyzer": {
+		               "type": "standard",
+		               "max_token_length": 5,
+		               "stopwords": "_english_"
+		            }
+		         }
+		      }
+		   }
+		}
+
+
+		POST index_4_analysis/_analyze
+		{
+		   "analyzer": "my_english_analyzer",
+		   "text": "Today's weather is beautiful"
+		}
+		--------------------------------------------------
+		{
+		   "tokens" : [
+		      {
+		         "token" : "today",
+		         "start_offset" : 0,
+		         "end_offset" : 5,
+		         "type" : "",
+		         "position" : 0
+		      },
+		      {
+		         "token" : "s",
+		         "start_offset" : 6,
+		         "end_offset" : 7,
+		         "type" : "",
+		         "position" : 1
+		      },
+		      {
+		         "token" : "weath",
+		         "start_offset" : 8,
+		         "end_offset" : 13,
+		         "type" : "",
+		         "position" : 2
+		      },
+		      {
+		         "token" : "er",
+		         "start_offset" : 13,
+		         "end_offset" : 15,
+		         "type" : "",
+		         "position" : 3
+		      },
+		      {
+		         "token" : "beaut",
+		         "start_offset" : 19,
+		         "end_offset" : 24,
+		         "type" : "",
+		         "position" : 5
+		      },
+		      {
+		         "token" : "iful",
+		         "start_offset" : 24,
+		         "end_offset" : 28,
+		         "type" : "",
+		         "position" : 6
+		      }
+		   ]
+		}
+
+
+		Standard analyzer (standard)
+		stopwords and max_token_length setting can be set for this analyzer. By default, stopwords list is empty and max_token_length is 255.
+
+		Simple analyzer (simple)
+		This analyzer is composed of lowercase tokenizer.
+
+
+		Whitespace analyzer (whitespace)
+		This analyzer is composed of whitespace tokenizer.
+
+		Stop analyzer (stop)
+		stopwords and stopwords_path can be configured. By default stopwords initialized to English stop words and stopwords_path contains path to a text file with stop words.
+
+
+
+		Tokenizers
+
+		Tokenizers are used for generating tokens from a text in Elasticsearch. 
+		Text can be broken down into tokens by taking whitespace or other punctuations into account. 
+		Elasticsearch has plenty of built-in tokenizers, which can be used in custom analyzer.
+
+		POST _analyze
+		{
+		   "tokenizer": "lowercase",
+		   "text": "It Was a Beautiful Weather 5 Days ago."
+		}
+		-----------------------------------------------------------------------
+		{
+		   "tokens" : [
+		      {
+		         "token" : "it",
+		         "start_offset" : 0,
+		         "end_offset" : 2,
+		         "type" : "word",
+		         "position" : 0
+		      },
+		      {
+		         "token" : "was",
+		         "start_offset" : 3,
+		         "end_offset" : 6,
+		         "type" : "word",
+		         "position" : 1
+		      },
+		      {
+		         "token" : "a",
+		         "start_offset" : 7,
+		         "end_offset" : 8,
+		         "type" : "word",
+		         "position" : 2
+		      },
+		      {
+		         "token" : "beautiful",
+		         "start_offset" : 9,
+		         "end_offset" : 18,
+		         "type" : "word",
+		         "position" : 3
+		      },
+		      {
+		         "token" : "weather",
+		         "start_offset" : 19,
+		         "end_offset" : 26,
+		         "type" : "word",
+		         "position" : 4
+		      },
+		      {
+		         "token" : "days",
+		         "start_offset" : 29,
+		         "end_offset" : 33,
+		         "type" : "word",
+		         "position" : 5
+		      },
+		      {
+		         "token" : "ago",
+		         "start_offset" : 34,
+		         "end_offset" : 37,
+		         "type" : "word",
+		         "position" : 6
+		      }
+		   ]
+		}
+
+		Standard tokenizer (standard)
+		This is built on grammar based tokenizer and max_token_length can be configured for this tokenizer.
+
+		Edge NGram tokenizer (edgeNGram)
+		Settings like min_gram, max_gram, token_chars can be set for this tokenizer.
+
+		Keyword tokenizer (keyword)
+		This generates entire input as an output and buffer_size can be set for this.
+
+		Letter tokenizer (letter)
+		This captures the whole word until a non-letter is encountered.
+
+		
+
+
+		
+
+=========================================================================================================================================================================
+
+
+	ElasticSearch - Reindex
+
+			Copies documents from a source to a destination.
+			The source can be any existing index, alias, or data stream. The destination must differ from the source. For example, you cannot reindex a data stream into itself.
+			Reindexing operations are resource-heavy, especially on large indices.
+			To minimize the time required for Reindexing, disable number_of_replicas by setting the value to 0 and enable them once the process is complete.
+			POST _reindex
+
+			PUT /destination_index/_settings
+			{
+			 "index" : {
+			  "number_of_replicas":0
+			 }
+			}
+
+			GET /destination_index/_settings
+
+
+			Enable _Source Field
+				The Reindexing operation requires the source field to be enabled on all the documents in the source index. 
+				PUT index_1
+				{
+				  “mappings”: {
+				    "_source": {
+				      "enabled": true
+				    }
+				  }
+				}
+
+
+			Reindex All Documents
+				To reindex documents, we need to specify the source and destination. 
+				Source and destination can be an existing index, index alias, and data streams.
+				You can use indices from the local or a remote cluster.
+
+				 For indexing to occur successfully, both source and destination cannot be similar.
+				 You must also configure the destination as required before Reindexing because it does not apply settings from the source or any associated template.
+
+				 PUT /source_index
+				{
+				  "settings": {"number_of_replicas": 0, "number_of_shards": 1},
+				  "mappings": {"_source": {"enabled": true}}
+				}
+
+				PUT /destination_index_new
+				{
+				  "settings": {"number_of_replicas": 0, "number_of_shards": 1},
+				  "mappings": {"_source": {"enabled": true}}
+				}
+
+				GET /source_index/_settings
+
+				POST _reindex
+				{
+				  “source”: {
+				    "index": "source_index"
+				  },
+				  "dest": {
+				    "index": "destination_index"
+				  }
+				}
+
+
+				GET /_tasks?detailed=true&actions=*reindex&group_by=parents
+				----------------------------------------------------------------------------
+				{
+			  "tasks" : {
+			    "FTd_2iXjSXudN_Ua4tZhHg:51847" : {
+			      "node" : "FTd_2iXjSXudN_Ua4tZhHg",
+			      "id" : 51847,
+			      "type" : "transport",
+			      "action" : "indices:data/write/reindex",
+			      "status" : {
+			        "total" : 13059,
+			        "updated" : 9000,
+			        "created" : 0,
+			        "deleted" : 0,
+			        "batches" : 10,
+			        "version_conflicts" : 0,
+			        "noops" : 0,
+			        "retries" : {
+			          "bulk" : 0,
+			          "search" : 0
+			        },
+			        "throttled_millis" : 0,
+			        "requests_per_second" : -1.0,
+			        "throttled_until_millis" : 0
+			      },
+			      "description" : "reindex from [source_index] to [destination_index][_doc]",
+			      "start_time_in_millis" : 1611247308063,
+			      "running_time_in_nanos" : 2094157836,
+			      "cancellable" : true,
+			      "headers" : { }
+			    }
+			  }
+
+
+			  GET /destination_index/_search
+
+			  POST /source_index/_doc/2
+				{
+				  "name": "Puneet",
+				  "country" : "India"
+				}
+
+
+				POST /_aliases
+				{
+				  "actions": [
+				    {
+				      "remove": {
+				        "index": "destination_index",
+				        "alias": "source_index"
+				      }
+				    }
+				  ]
+				}
+
+
+				POST /_aliases
+				{
+				  "actions": [
+				    {
+				      "add": {
+				        "index": "destination_index",
+				        "alias": "source_index"
+				      }
+				    }
+				  ]
+				}
+
+
+=====================================================================================================================================================================
+
+
+		ElasticSearch Alias
+
+		PUT person/_doc/4
+		{
+		  "name": "Soumya"
+		}
+
+
+		POST /_aliases
+		{
+		  "actions": [
+		    {
+		      "add": {
+		        "index": "person",
+		        "alias": "person_alias"
+		      }
+		    }
+		  ]
+		}
+
+
+		GET person_alias/_search
+
+
+		You have data and after several months you have to ingest a new data . So we would create a new index and push all the data there and 
+		then you would create an alias of original index and then once alias is created you would delete old index .
+
+
+
+
+============================================================================================================================================================
+
+		Index ,Shards and Replicas
+
+		Data is stored in shards
+		Complete Lucene index
+		Distribute shards for performance
+
+
+		Shard - Basic Building block of an index(horizontal partition of an index)
+		In elastic search ,each shard is a self -contained lucene index in itself
+		Index is where data is stored or organized 
+		Within an index, it is actually broken up on disk into multiple shards if we follow a multi shard configuration
+		By default index have 5 shards 
+		Everyday 5 lucene indices are made in our clusters that store the active data for that index  - Distributed storage feature
+		Means shards are distributed in horizontal cluster - you have distributed the processing of that data as well as searching of data 
+		Distributing indexing you can have 5 computer or servers processing this data as it's being indexed to be stored as you gonna have five nodes also doing the search at the same time
+
+		Replicas - Each shards get a replica if that's how you have your index configured
+				   Protect against failure of node - you have 3 nodes in elasticsearch cluster and indexes are distributed and they are backed up using replicas across your cluster 
+				   									 and one of your nodes goes down
+				   	Redundancy - 
+				   	Enhanced search speed 
+
+
+
+		PUT /my-index-000001
+		{
+		  "settings": {
+		    "index": {
+		      "number_of_shards": 3,  
+		      "number_of_replicas": 2 
+		    }
+		  }
+		}
+
+================================================================================================================================================================
+
+
+	Index - Mapping
+
+	Mapping is the process of defining how a document, and the field it contains, are stored and indexed.
+	Each document is a collection of fields, which each have their own data type. 
+	When mapping your data, you create a mapping definition, which contains a list of fields that are pertinent to the document.
+	A mapping definition also includes metadata fields, like the _source field
+
+	Use dynamic mapping and explicit mapping to define your data
+	For example,explicitly map fields where you don’t want to use the defaults, or to gain greater control over which fields are created.
+	You can then allow Elasticsearch to add other fields dynamically.
+
+	Dynamic mapping - Dynamic mapping allows you to experiment with and explore data when you’re just getting started. Elasticsearch adds new fields automatically, just by indexing a document.
+						 You can add fields to the top-level mapping, and to inner object and nested fields.
+						 Use dynamic templates to define custom mappings that are applied to dynamically added fields based on the matching condition.
+
+
+
+	Explicit mapping -  Explicit mapping allows you to precisely choose how to define the mapping definition, such as:
+						Which string fields should be treated as full text fields.
+						Which fields contain numbers, dates, or geolocations.
+						The format of date values.
+						Custom rules to control the mapping for dynamically added fields.
+
+
+						Use runtime fields to make schema changes without reindexing.
+
+
+		PUT  _index_template/my_dynamic_index
+		{
+			"index_patterns":[
+				"my_dynamic_index-*"
+			],
+			"template":[
+				"mappings":{
+					"dynamic": "runtime",
+					"properties":{
+						"name": { "type":"text"},
+						"timestamp":{
+							"type":"date",
+							"format": "yyyy-MM-dd"
+						},
+						"price": { "type": "integer"}
+
+					}
+				}
+			]
+		}
+
+
+
+		GET my_dynamic_index-1/_mapping
+
+		POST my_dynamic_index/_bulk
+		{
+			{ "name":"Puneet", "timestamp":"2021-01-01", "price": 100 , "new_field":"data1" } 
+			{ "name":"Abhinav", "timestamp":"2021-01-01", "price": 200 , "new_field":"data2" } 
+			{ "name":"Vivek", "timestamp":"2021-01-01", "price": 300 , "new_field":"data3" } 
+		}
+
+
+		GET my_dynamic_index/_search
+		{
+			"query":{
+				"match":	{
+					"new_field": "data1"
+				}
+			}
+		}
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+	POST user/_create/1
+	{
+		"name": "jake",
+		"dob": "2021-01-01",
+		"job_desc": "President"
+	}
+
+	Put user 
+	{
+		"mappings":{
+			"properties":{
+				"dob":{
+					"type":"date",
+					"format": "yyyy-mm-dd"
+				},
+				"job_desc":{
+					"type":"text",
+					"index":false
+				}
+			}
+		}
+	}
+
+	GET user
+
+	Delete user
+
+	Get _search?q=jake
+
+==========================================================================================================================================================================
+
+
+		Sequence No vs version no in ES
+
+			version is a sequential number that counts the number of time a document was updated
+			_seq_no is a sequential number that counts the number of operations that happened on the index
+
+
+			POST test/_doc/_bulk
+			{"index": {}}
+			{"test": 1}
+			{"index": {}}
+			{"test": 2}
+			{"index": {}}
+			{"test": 3}
+-------------------------------------------------------------
+			{
+			  "took" : 166,
+			  "errors" : false,
+			  "items" : [
+			    {
+			      "index" : {
+			        "_index" : "test",
+			        "_type" : "_doc",
+			        "_id" : "d2zbSW4BJvP7VWZfYMwQ",
+			        "_version" : 1,
+			        "result" : "created",
+			        "_shards" : {
+			          "total" : 2,
+			          "successful" : 1,
+			          "failed" : 0
+			        },
+			        "_seq_no" : 0,
+			        "_primary_term" : 1,
+			        "status" : 201
+			      }
+			    },
+			    {
+			      "index" : {
+			        "_index" : "test",
+			        "_type" : "_doc",
+			        "_id" : "eGzbSW4BJvP7VWZfYMwQ",
+			        "_version" : 1,
+			        "result" : "created",
+			        "_shards" : {
+			          "total" : 2,
+			          "successful" : 1,
+			          "failed" : 0
+			        },
+			        "_seq_no" : 1,
+			        "_primary_term" : 1,
+			        "status" : 201
+			      }
+			    },
+			    {
+			      "index" : {
+			        "_index" : "test",
+			        "_type" : "_doc",
+			        "_id" : "eWzbSW4BJvP7VWZfYMwQ",
+			        "_version" : 1,
+			        "result" : "created",
+			        "_shards" : {
+			          "total" : 2,
+			          "successful" : 1,
+			          "failed" : 0
+			        },
+			        "_seq_no" : 2,
+			        "_primary_term" : 1,
+			        "status" : 201
+			      }
+			    }
+			  ]
+			}
+
+
+			for all documents, version is 1
+			for document 1, _seq_no is 0 (first index operation)
+			for document 2, _seq_no is 1 (second index operation)
+			for document 3, _seq_no is 2 (third index operation)
+
+
+
+================================================================================================================================================================================================================
+
+
+
+	
+		ElasticSearch Analysis
+
+		Text analysis is the process of converting unstructured text, like the body of an email or a product description, into a structured format that’s optimized for search.
+
+
+		Searching - needs to fulfil two important criterias
+		
+		1) Low Latency	 - means whenever we search something the search result would be obtained very faster as soon as possible like google	
+		2) High Throughput  - The system should be able to answer a lot of queries at any given point of time that means that even though there are 
+							  thousands or millions or billions of users are searching some queries in that system the sytem should be  still be able to
+							  answer to all of them and it should be scalable 
+
+
+
+		Indexing of document then genearation of meta data 
+		Then User performs the query - Query is going to look into meta data and Then it will give results to users
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,144 @@
+Query and Searching
+
+
+PUT person1/_bulk
+  { "create" : { "_index" : "person1", "_id" : "1" } }
+  { "name":"Vivek", "country": "Australia" }
+  { "create" : { "_index" : "person1", "_id" : "2" } }
+  { "name":"Abhinav","country": "India" }
+  { "create" : { "_index" : "person1", "_id" : "3" } }
+  { "name":"Ritvik","country": "India" }
+  { "create" : { "_index" : "person1", "_id" : "4" } }
+  { "name":"Ajay","country": "China" }
+  { "create" : { "_index" : "person1", "_id" : "5" } }
+  { "name":"Amar","country": "India" }
+
+
+URI Search
+
+GET person1/_search?q=country:India%20AND%20name:Ritvik
+{
+  "from": 0,
+  "size": 20
+}
+
+
+GET /person1/_search
+{
+   "query":{
+      "match_all":{}
+   }
+}
+
+
+query
+
+GET /person1/_search
+{
+   "query":{
+      "query_string":{
+         "query":"India"
+      }
+   }
+}
+
+
+GET /person1/_search
+{
+   "query":{
+      "match" : {
+         "country":"India"
+      }
+   }
+}
+
+Multi Match 
+
+POST /person1/_search
+{
+   "query":{
+      "multi_match" : {
+         "query": "India",
+         "fields": [ "country", "name" ]
+      }
+   }
+}
+
+
+---------------------------------------------------------------------
+
+Bool query
+
+PUT person1/_bulk
+  { "create" : { "_index" : "person1", "_id" : "1" } }
+  { "name":"Vivek", "country": "Australia", "salary": "5000" }
+  { "create" : { "_index" : "person1", "_id" : "2" } }
+  { "name":"Abhinav","country": "India","salary": "15000" }
+  { "create" : { "_index" : "person1", "_id" : "3" } }
+  { "name":"Ritvik","country": "India","salary": "25000" }
+  { "create" : { "_index" : "person1", "_id" : "4" } }
+  { "name":"Ajay","country": "China","salary": "35000" }
+  { "create" : { "_index" : "person1", "_id" : "5" } }
+  { "name":"Amar","country": "India","salary": "55000" }
+
+
+GET person1/_search
+{
+  "query": {
+    "bool": {
+      "filter": [
+        {"range": {
+          "salary": {
+            "gte": 20000,
+            "lte": 50000
+          }
+        }}
+      ]
+    }
+  }
+}
+
+
+GET person1/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {
+          "country": "India"
+        }}
+      ], 
+      "filter": [
+        {"range": {
+          "salary": {
+            "gte": 20000,
+            "lte": 50000
+          }
+        }}
+      ]
+    }
+  }
+}
+
+
+GET person1/_search
+{
+  "query": {
+    "bool": {
+      "must_not": [
+        {"match": {
+          "country": "India"
+        }}
+      ], 
+      "filter": [
+        {"range": {
+          "salary": {
+            "gte": 20000,
+            "lte": 50000
+          }
+        }}
+      ]
+    }
+  }
+}
+

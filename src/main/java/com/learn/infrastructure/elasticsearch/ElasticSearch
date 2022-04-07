@@ -1,0 +1,378 @@
+																ElasticSearch
+
+
+ElasticSearch is a distributed,open source search and analytics engine for all types of data,including textual,numerical,geospatial,structured and unstructured.
+Real time distributed and analytics engine
+
+open source developed in java
+based on lucene engine on the top of which we have rest interface(restful apis)
+Supports full-text search i.e. completely document based instead of tables and schemas
+used for single page application projects
+
+Layman Terms - 
+	
+	ElasticSearch is a database that stores,retrieves and manages document-oriented and semi-structured data. 
+
+
+Why use ElasticSearch?
+
+	Products that involve e-commerce and search engines with huge databases are facing issues,including product information retrieval taking too long.
+	This leads to poor user experience and in turn turns off potential customers. 
+	Lag in search is attributed to the relational database used for the product design, where the data is scattered among multiple tables - and 
+	the successful retrieval of meaningful user information requires fetching the data from these tables. 
+	The Relational database works compartively slowly when it comes to huge data and fetching search results through database queries.
+	Query and Analyze 
+
+
+
+What is ES used for ?
+	1. Application Search  2. Website Search  3. Logging and log analytics   4. Geospatial data analysis and visualization  5. Business Analytics
+
+Advantages of ES
+	Scalability
+	Really Fast
+	Multilingual
+	Schema Free(All the data is formed in documents)
+	Document-oriented
+	Autocomplete and instant search
+
+
+
+How does ElasticSearch work
+
+	Raw data flows into ElasticSearch from a variety of sources, including logs,system metrics and web applications
+	Data ingestion is the process by which this raw data is parsed, normalized, and enriched before it is indexed in elasticsearch. 
+	Once indexed in elasticsearch, users can run complex queries against their data and use aggregations to retrieve complex summaries of their data.
+	From kibana, users can create powerful visualizations of their data,share dashboards and manage elastic stacks
+
+
+Basic concepts of Elasticsearch
+	
+	Cluster
+		A cluster is a collection of one or more servers that together hold entire data and give federated indexing and search capabilities across all nodes(servers).
+		and is identified by unique name(by default it is elasticsearch)
+		For Relational databases, the node is DB instance. There can be N nodes with the same cluster name. 
+
+	Near-Real-Time(NRT)
+		Elasticsearch is a near real time search platform.There is a slight from the time you index a document until the time it becomes searchable.
+
+	Index
+		The index is a collection of documents that have similar characteristics and is identified by a name.
+		This name is used to refer to the index while performing indexing ,search , update and delete operations against the documents in it.
+
+	Type 
+		A type is a logical category/partition of an index whose semantics is completely. 
+		It is defined for documents that have a set of common fields.
+		You can define more than one type in your index
+
+	Document
+		A document is a basic unit of information which can be indexed.
+		It is expressed in Json which is an ubiquitous internet data interchange format
+
+	Shards 
+		Elasticsearch provides the ability to subdivide the index into mulitiple pieces called shards
+		Each shard is in itself a fully-functional and independent "index" that can be hosted on any node within the cluster
+
+	Replicas 
+		Elasticsearch allows you to make one or more copies of your index's shard which are called replica shard or replica 
+
+	Node 
+		A node is a single server which is a part of cluster,stores data and partcipates in the cluster's indexing and search capabilities
+		A node is a single server that holds some data and participates on the cluster's indexing and querying.
+		A node can be configured to join specific cluster by the particular cluster name.
+		A single cluster can have as many nodes as we want. A node is simply one Elasticsearch instance.
+
+	 Shards
+	 	A shard is a subset of documents of an index. An index can be divided into many shards.
+
+	 	
+
+
+	 	API Conventions
+	 		The elasticsearch Rest Apis are accessed using json over http. Elasticsearch uses the following conventions throughout the Rest API:
+
+	 		Multiple indices 		Date math support in index name 			Common options 		url based access control
+
+
+
+	 	ElasticSearch APIs
+	 		Document APIs
+	 		Search APIs
+	 		Aggregation
+	 		Index APIs
+	 		Cluster APIs
+
+
+	 	Document API 
+	 			Single Document API
+	 				Index Api
+	 				Get Api
+	 				Update Api
+	 				Delete Api
+
+	 			Multi Document API
+	 				Multi Get Api
+	 				Bulk Api
+	 				Delete by query Api
+	 				update by query api
+	 				Reindex api
+
+	 
+
+	 Few Commands-
+	 GET _search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+Get /_cat/health
+
+POST /customer/_doc/2?pretty
+{
+  "name": "ajay"
+}
+
+GET customer/_doc/2
+
+
+
+----------------------------------------------
+
+ElasticSearch Rest APIs
+
+Index (PUT/POST) API
+It helps to add or update the JSON document in an index when a request is made to that respective index with specific mapping
+
+GET API
+API helps to extract type JSON object by performing a get request  for a particular document. 
+
+DELETE API 
+You can delete a particular index,mapping or a document by sending an HTTP DELETE request to elasticsearch
+
+UPDATE API
+Update the docs/data put into elasticsearch
+
+
+
+Search in elasticsearch
+GET customer/_search
+{
+  "query": {"match": {
+    "name": "ritvik"
+  }
+  }
+}
+
+
+
+----------------------------------------------------
+
+Logstash
+
+Logstash is a tool based on the filter/pipes patterns for gathering,processing and generating logs or events.
+It helps in centralizing and making real time analysis of logs and events from different sources.
+
+
+Logstash can collect data from different sources and send to multiple destinations
+Logstash can also handle http requests and response data. 
+Logstash can handle all types of logging data like Apache logs, Window event logs, Data over network protocols, and many more
+Logstash provides variety of filters, which helps the user to find more meaning in the data by parsing and transforming it 
+Logstash can also be used for handling sensors data in internet of things
+
+
+
+Key Concepts 
+	Event Object 
+		It is the main object in Logstash, which encapsulates the data flow in the logstash pipeline.
+		Logstash uses this object to store the input data and add extra fields created during the filter stage.
+		Logstash offers an Event API to developers to manipulate events
+
+
+	Pipeline 
+		It comprises of data flow stages in Logstash from input to output.
+		The Input data is entered in pipeline and is processed in the form of event.
+		Then sends to an output destination in the user or end sytem's desirable format.
+
+	Input 
+		This is the first stage in the Logstash pipeline, which is used to get the data in Logstash for futher processing.
+		Logstash offers various plugins to get data from different platformss. Some of the most commonly used plugins are 
+		 - File, Syslog , Redis and Beats.
+
+	Filter 
+		This is the middle stage of logstash, where the actual processing of events take place. 
+		A developer can use pre-defined Regex patterns by logstash to create sequences for differentiating between the fields
+		in the events and criteria for accepted input events.
+
+
+	Output
+		This is the last stage in logstash pipeline , where the output events can be formatted into the structure required by the 
+		destination systems.
+		Lastly, it sends the output event after complete processing into destination by using plugins. 
+		Some of the most commonly used plugins are - Elasticsearch, File, Graphite, etc 
+
+
+
+
+Advantages of Logstash 
+
+	Logstash offers regex pattern sequences to identify and parse the various fields in any input event.
+	Logstash supports a variety of web servers and data sources for extracting logging data
+	Logstash provides multiple plugins to parse and transform the logging data into any user desirable format
+	Logstash is centralized, which makes it easy to process and collect data from different servers.
+	Logstash uses HTTP protocol, which enables the user to upgrade Elasticsearch versions without having to upgrade Logstash in lock step
+
+
+
+Disadvantages
+
+	Working with logstash can sometimes be a little complex, as it needs good understanding and analysis of the logging data
+	Filter plugins are not so generic, so the user may need to find the correct sequence of patterns to avoid error in parsing.  
+
+
+
+--------------------------------------------------------
+
+
+
+
+Mapping 
+
+	Mapping is the process of defining how a document , and the fields that it contains, are stored and indexed.
+
+
+	Mapping Types 
+		1. Meta - fields		2. Fields or Properties
+
+
+	Field Data Types
+		Core Data types				 		Geo Data type
+		Complex Data types				Specialized Data types
+
+
+	Dynamic Mapping 
+
+	Mapping Parameters
+				....................
+
+
+
+
+	---------------------------------------------------------
+
+	API 
+
+	1.   POST /index1,index2,index3/_search
+		{
+   "query":{
+      "query_string":{
+         "query":"any_string"
+      }
+   }
+}
+
+JSON objects from index1, index2, index3 having any_string in it.
+
+
+2.  POST /_all/_search 
+	{
+   "query":{
+      "query_string":{
+         "query":"any_string"
+      }
+   }
+}
+JSON objects from all indices and having any_string in it.
+
+3. POST /school*/_search
+{
+   "query":{
+      "query_string":{
+         "query":"CBSE"
+      }
+   }
+}
+
+JSON objects from all indices which start with school having CBSE in it.
+
+
+POST /school*,-schools_gov /_search
+{
+   "query":{
+      "query_string":{
+         "query":"CBSE"
+      }
+   }
+}
+JSON objects from all indices which start with “school” but not from schools_gov and having CBSE in it.
+
+
+POST /schools_pri*/_search?allow_no_indices = true
+{
+   "query":{
+      "match_all":{}
+   }
+}
+
+{
+   "took":1,"timed_out": false, "_shards":{"total":0, "successful":0, "failed":0},
+   "hits":{"total":0, "max_score":0.0, "hits":[]}
+}
+
+
+
+-------------------------------------------------
+
+Response Filtering
+POST /schools/_search?filter_path = hits.total
+
+{
+   "query":{
+      "match_all":{}
+   }
+}
+
+
+{"hits":{"total":3}}
+
+
+
+====================================================================
+
+Index API 
+	PUT schools/_doc/5
+{
+   name":"City School", "description":"ICSE", "street":"West End",
+   "city":"Meerut",
+   "state":"UP", "zip":"250002", "location":[28.9926174, 77.692485],
+   "fees":3500,
+   "tags":["fully computerized"], "rating":"4.5"
+}
+
+{
+   "_index" : "schools",
+   "_type" : "_doc",
+   "_id" : "5",
+   "_version" : 1,
+   "result" : "created",
+   "_shards" : {
+      "total" : 2,
+      "successful" : 1,
+      "failed" : 0
+   },
+   "_seq_no" : 2,
+   "_primary_term" : 1
+}
+
+Disable Automatic Index Creation
+
+		action.auto_create_index:false
+		index.mapper.dynamic:false
+
+
+		action.auto_create_index:+acc*,-bank*
+Here + indicates allowed and – indicates not allowed.
+
+
+

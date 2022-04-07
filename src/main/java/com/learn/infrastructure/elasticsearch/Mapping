@@ -1,0 +1,112 @@
+Mapping 
+
+
+
+PUT bank
+{
+  "mappings": {
+    "properties": {
+      "name" : {"type": "text"},
+      "balance":{ "type": "double"},
+      "creationDate": {"type": "date"}
+    }
+  }
+}
+
+Put bank/_doc/1
+{
+  "name":"Puneet",
+  "balance": "1000",
+  "creationDate": "2021-01-01"
+}
+
+PUT bank/_bulk
+  { "create" : { "_index" : "bank", "_id" : "2" } }
+  { "name":"Abhinav","balance": "2000","creationDate": "2021-02-02" }
+  { "create" : { "_index" : "bank", "_id" : "3" } }
+  { "name":"Vivek","balance": "3000","creationDate": "2021-03-03" }
+
+GET bank/_search
+
+GET bank/_mappings
+
+Get bank/_settings
+
+POST /tabletennis/_doc/1
+		{
+		   "group" : "players",
+		   "user" : [
+		      {
+		         "first" : "dave", "last" : "jones"
+		      },
+		      {
+		         "first" : "kevin", "last" : "morris"
+		      }
+		   ]
+		}
+		
+Get /tabletennis		
+
+
+Dynamic Mapping
+
+
+
+PUT _index_template/my_dynamic_index
+{
+  "index_patterns": [
+    "my_dynamic_index-*"
+  ],
+  "template": {
+    "mappings": {
+      "dynamic": "runtime",
+      "properties": {
+        "timestamp": {
+          "type": "date",
+          "format": "yyyy-MM-dd"
+        },
+        "response_code": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}
+
+GET my_dynamic_index-3/_mapping
+
+PUT my_dynamic_index-3/_bulk
+  { "create" : { "_index" : "my_dynamic_index-3", "_id" : "10" } }
+  { "name":"Santosh","country": "India" }
+  { "create" : { "_index" : "my_dynamic_index-3", "_id" : "11" } }
+  { "name":"Anup", "country": "Australia" }
+  
+  
+  
+PUT my_dynamic_index-3/_doc/20
+{
+  "timestamp": "2021-01-01",
+  "response_code": "200",
+  "name":"Puneet", 
+  "country": "India"
+}
+
+
+GET my_dynamic_index-3/_search
+
+GET my_dynamic_index-3/_search
+{
+  "query": {
+    "match": {
+      "country": "India"
+    }
+  }
+}
+
+
+ "dynamic": "strict"
+
+
+ index.mapping.total_fields.limit
+
+ https://github.com/giladgal/Examples-for-Elasticsearch-runtime-fields-API-calls/blob/main/Dynamically%20created%20runtime%20fields

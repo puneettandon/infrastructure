@@ -1,0 +1,93 @@
+Analyzer
+
+
+
+POST _analyze
+{
+   "analyzer": "standard",
+   "text": "Today's weather is beautiful"
+}
+
+
+PUT index_4_analysis
+{
+   "settings": {
+      "analysis": {
+         "analyzer": {
+            "my_english_analyzer": {
+               "type": "standard",
+               "max_token_length": 5,
+               "stopwords": "_english_"
+            }
+         }
+      }
+   }
+}
+
+
+POST index_4_analysis/_analyze
+{
+   "analyzer": "my_english_analyzer",
+   "text": "Today's weather is beautiful"
+}
+
+
+-------------------------------------------------------------------
+Full Text Search
+
+PUT my-index-000001
+{
+  "settings": {
+    "analysis": {
+      "filter": {
+        "autocomplete_filter": {
+          "type": "edge_ngram",
+          "min_gram": 1,
+          "max_gram": 20
+        }
+      },
+      "analyzer": {
+        "autocomplete": { 
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": [
+            "lowercase",
+            "autocomplete_filter"
+          ]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "text": {
+        "type": "text",
+        "analyzer": "autocomplete", 
+        "search_analyzer": "standard" 
+      }
+    }
+  }
+}
+
+PUT my-index-000001/_doc/1
+{
+  "text": "Quick Brown Fox" 
+}
+
+GET my-index-000001/_search
+{
+  "query": {
+    "match": {
+      "text": {
+        "query": "Quick Br", 
+        "operator": "and"
+      }
+    }
+  }
+}
+
+
+----------------------------------------------------------------------------
+
+
+
