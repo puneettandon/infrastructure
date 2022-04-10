@@ -1,0 +1,85 @@
+###What is Git ? 
+
+- Free and open source version control system
+
+###What is version Control?
+- The management of changes to documents, computer programs, large web sites, and other collections of information.
+
+###Terms
+ - Directory  > Folder
+ - Terminal or Command Line  -> Interface for text commands
+ - CLI > Command Line Interface
+ - Repository  > Project, or the folder/place where your project is kept (Basically Git Repository)
+ - Github > A website to host your repositories online
+ 
+### Git Commands
+- clone  - bring a repository that is host somewhere like Github into folder 
+on you local machine 
+- add - Track your files and changes in Git 
+- commit - Save your files in Git
+- push - upload git commits to a remote repo , like github
+- pull - Download changes from remote repo to your local machine, opp of push
+
+
+## Basic Git Commands
+- git -version
+- git clone 
+-  ls -la   -> to get hidden .git directory
+- Untracked files - files not under git 
+- Staged with Git using -  git add 
+- Generate key for git 
+    - ssh-keygen -t rsa -b 4096 -C "githubemailaddress"
+    - for multiple accounts use different key name
+    - will generate two keys - use pub key to upload on github
+    - use this command -> pbcody < ~/<key-name>.pub  to copy to github
+
+- git push origin master
+    - to push the changes
+   
+- git push --set -upstream origin feature-branch 
+-or
+- git push -u origin feature-branch  
+
+- git remote add origin <git@github.com:puneettandon/repo.git>
+
+- git remote -v
+
+- git push -u origin master
+
+- git branch
+
+- git branch -d feature-branch
+    - to delete the branch
+- git checkout -b feature-branch
+
+- git diff 
+
+- ### Delete Untracked changes git
+  git clean -n 
+    - If you want to see which files will be deleted you can use the -n option before you run the actual command
+
+  git clean -f
+    - Then when you are comfortable (because it will delete the files for real!) use the -f option
+
+  git clean -f -d
+    - To remove directories
+
+  git clean -f -X
+    - To remove ignored files
+
+  git clean -f -x
+    - To remove ignored and non-ignored files
+  
+
+
+- ### Head in Git
+  
+
+- ### History in Git
+  - git show <commit-id>
+  
+
+
+
+    
+    
