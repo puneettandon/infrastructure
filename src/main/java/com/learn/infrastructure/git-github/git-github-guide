@@ -79,6 +79,15 @@ on you local machine
   - git show <commit-id>
   
 
+- How to undo git add for certain file
+  - If you need to remove a single file from the staging area, use
+    - git reset HEAD -- filename
+  - If you need to remove a whole directory (folder) from the staging area, use
+    - git reset HEAD -- directoryName
+
+
+  
+
 
 
     

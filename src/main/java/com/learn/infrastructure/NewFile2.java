@@ -1,6 +1,4 @@
 package com.learn.infrastructure;
 
-public class Testfile {
-// ToDO
-
+public class NewFile2 {
 }
