@@ -86,7 +86,13 @@ on you local machine
     - git reset HEAD -- directoryName
 
 
-  
+- ### How to make local and remote branches sync
+  - suppose local branches have different commit than remote branches
+  then use these commands
+    - git fetch --prune origin 
+    - git reset --hard origin/master
+    - git clean -f -d  
+
 
 
 
