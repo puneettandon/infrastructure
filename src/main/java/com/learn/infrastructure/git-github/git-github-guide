@@ -85,6 +85,8 @@ on you local machine
   - If you need to remove a whole directory (folder) from the staging area, use
     - git reset HEAD -- directoryName
 
+  - If whole 
+    - git reset HEAD
 
 - ### How to make local and remote branches sync
   - suppose local branches have different commit than remote branches
