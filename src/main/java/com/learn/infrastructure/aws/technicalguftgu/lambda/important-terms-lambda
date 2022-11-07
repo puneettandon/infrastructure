@@ -1,0 +1,15 @@
+Important Terms in Lambda
+
+1) Function - A function is a resource that you can invoke to run your code in aws lambda.
+A function has code that processes events , and runtime that passes request and responses between lambda and the function code.
+
+2) Runtime - Lambda runtime allows function in different languages to run in the same base execution.The runtime sits in between
+the lambda service and your function code, relaying invocation events , context information and responses between the two.
+
+3) Event is a json formatted document that contains data for a function to process
+
+4) Event source/trigger - An aws service such as amazon sns , or custom service that triggers your functions and executes its logic
+
+5) Downstream Resource - An aws service such as dynamodb tables or s3 buckets , that your lambda function calls once it is triggered
+
+6) Concurrency - No of request that your function is serving in any given time - default is 1000

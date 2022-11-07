@@ -1,0 +1,122 @@
+Subnetting
+
+IPv4  -> Limited
+
+1) use Private IP  - 10.0.0.0 , 172.16.x.x, 192.0.0.0
+
+2) use IPv6
+
+3) use Subnetting
+
+
+
+Subnetting
+    network within a network
+            or
+    Logically Division of IP Address
+
+
+
+    190.20.10.2
+    10 computers  ----router-------router-------  20 computers
+                        |             |
+                        |             |
+                       50 computer    4 computer
+                        190.20.10.15 can not of other network
+                        15.10.0.1
+
+   190.20.0.0 network id
+
+   each router interface should different network id
+
+   Router is inter-networking device  used to communicate  b/w two different networks
+   within network communication use switch
+
+
+
+Benefits of Subnetting
+
+   10.0.0.0                                         200.10.10.0
+    10 computers  ----router-------router-------  20 computers
+                        |             |
+                        |             |
+                       50 computer    4 computer
+                       130.10.0.0        200.10.11.0
+
+
+     10.0.0.0    ->  10.0.0.1   10.0.0.2   10.0.0.3  10.0.0.4   10.0.0.5   10.0.0.6   10.0.0.7  10.0.0.8   10.0.0.9   10.0.0.10 = total = 2^24 -2
+
+     130.10.0.0 -> 130.10.0.0 --130.10.0.1 ...130.10.0.2......................130.10.0.50  = total = 2^16 -2 = 65534
+
+     200.10.10.0  ->  200.10.10.0  ........200.10.10.20 = total = 2^8 -2 = 254
+
+
+
+     By default CIDR value of class A - /8
+                              class B - /16
+                              class C - /24
+
+
+     If by default it's mention means no subnetting , other value subnetting has happened
+
+     10.0.0.0/8
+     130.10.0.0/16
+     200.10.10.0/24
+
+
+---------------------------------------------------------------------------------------------------------------------------
+
+Q1
+
+        10 Pcs -----------router1-------------router2------------40Pcs
+                            |                   |
+                            |                   |
+                            |                   |
+                            30Pcs               20Pcs
+
+               class c - 197.10.10.0/24
+
+
+               we require 5 networks (even b/w routers)
+
+
+
+               197      10       10       0
+
+               197      10      10        00000000     - network id
+
+               2^n -2  >= 40
+               2^6 -2  >= 40
+
+
+               host bit -   0
+               network bit - 1
+
+               197     10      10       11000000
+
+               197     10      10        192
+
+
+  subnet mask   255   255    255     192
+
+
+                197   10      10      0/26     subnet id1
+
+                197   10      10      64/26    subnet id2
+
+                197   10      10      128/26   subnet id3
+
+                197   10      10       192/26  subnet id4
+
+
+
+
+
+
+
+
+
+
+
+
+

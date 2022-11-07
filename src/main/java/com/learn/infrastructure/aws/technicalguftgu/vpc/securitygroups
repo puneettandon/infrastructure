@@ -1,0 +1,29 @@
+Security Groups
+
+-> It is a virtual firewall works at ENI level
+-> Upto 5 security groups per EC2 instance interface can be applied
+-> can only have permit rules, cannot have deny rule
+-> Stateful, return traffic, of allowed inbound traffic is allowed , even if there are no rules to allow it
+
+
+Security Groups work on ec2 level
+
+NACL - network address control list work availability zone or region level or vpc level
+
+NACL can have permit as well as deny rule
+
+
+Network ACL
+
+-> It is a function performed on the implied router
+-> NACL is an optional layer of security for your vpc that acts as a firewall for controlling traffic in and out
+of one or more subnets
+-> Your VPC automatically comes with a modifiable default network ACL.By default , it allows all inbound
+and outbound ipv4 and if applicable, ipv6 traffic
+-> You can create a custom network ACL and associate it with a subnet.By default , each custom network ACL
+denies all inbound and outbound traffic until you add rules.
+-> The highest number that you can use for a rule is 32766. Recommend that you start by creating rules with rule numbers
+that  a multiple of 100, so that you can insert new rules where you need later
+-> It functions at the subnet level
+-> NACL are stateless, outbound traffic for an allowed inbound traffic, must be explicitly allowed too
+-> You can have permit and deny rules in a NACL

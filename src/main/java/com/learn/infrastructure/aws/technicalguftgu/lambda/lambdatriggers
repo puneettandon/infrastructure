@@ -1,0 +1,17 @@
+Lambda Triggers
+
+-> You can use AWS Lambda to run your code in response to
+    - Events such as changes to data in Amazon s3 bucket or an amazon dynamodb table
+    - To run your code in response to Http Request using Amazon API Gateway
+    - With these capabilities, you can use lambda to easily build data processing triggers for aws services like amazon s3
+    and amazon dynamodb , process streaming data stored in kinesis or create your own backend that operates at AWS scale performance and security
+
+
+
+Example of S3
+
+- The user create an object in a bucket
+- Amazon s3 detects the object created event
+- Amazon s3 invokes your lambda functions using the Permission provided by the execution role
+- Amazon s3 knows which lambda function to invoke based on the event source mapping that is stored in the bucket
+notification configuration

@@ -1,0 +1,7 @@
+                Security Group                                      NACL
+->   operate at instance level                              operate at subnet level
+->   support allows rules only                              it permits allow as well as deny rules
+->   Stateful,return traffic is                             Stateless, return traffic must be explicitly
+     automatically allowed                                  allowed by rules
+->   Applies to instance only                               Applies to all instances in the subnet
+

@@ -1,0 +1,100 @@
+Virtual Private Cloud
+
+A virtual private cloud is a virtual network that closely resembles a traditional networking that you operate in your
+own data center, with the benefits of using the scalable infrastructure of AWS.
+
+    or
+
+
+VPC is a virtual network or data network inside AWS for one client.
+
+-> It is logically isolated from other virtual network in the AWS Cloud.
+
+-> Max 5 VPC can be created in one region and 200 subnets in 1 VPC.
+
+-> We can allocate max 5 elastic IP
+
+-> Once we created VPC, DHCP(Dynamic Host Configuration Protocol),NACL(Network Access Control List), and Security Group will be
+automatically created
+
+-> A VPC is confined to an AWS Region and does not extend between Regions
+
+-> Once the VPC is created, you cannot change its CIDR Block Range
+
+-> If you need a different CIDR size, create a new vpc
+
+-> The different subnets within a VPC cannot overlap
+
+-> You can however expand your VPC CIDR by adding new/extra IP address ranges(except GovCloud and AWS china)
+
+-> Components of VPC
+
+    CIDR and IP address Subnets
+    - Implied router and routing table
+    - Internet Gateway
+    - Security Groups
+    - Network ACL
+    - Virtual Private Gateway
+    - Peering Connections
+    - Elastic IP
+
+
+---------------------------------------------
+
+VPC Types
+
+Default VPC         Custom VPC
+
+Default VPC
+    created in each AWS region when an AWS account is created
+    Has default CIDR, security group, NACL and route table settings
+    Has an internet gateway by default
+
+Custom VPC
+    Is a vpc an AWS account owner creates
+    Aws user creating the custom vpc can decide the CIDR
+    Has its own default security group,network ACL, and route table
+    Does not have internet gateway by default , one needs to be created if needed
+
+
+
+------------------------------------------------------------
+
+Steps to create a vpc
+
+-> create a vpc
+-> then subnet
+-> then internet gateway
+-> then route table
+
+
+
+------------------------------------------------------------------
+
+
+public subnet / private subnet
+
+
+Public Subnet - If a subnet's traffic is routed to an internet gateway , the subnet is known as Public Subnet.If you want your instance
+in a public subnet to communicate with the internet over ipv4, it must have a public IPv4 or an elastic ip address.
+
+
+Private Subnet - If a subnet does not have a route to the internet  gateway, the subnet is known as a private subnet
+
+
+--> When you create a vpc, you must specify an ipv4 CIDR block for the vpc.The allowed block size is between /16  to /28 netmask
+--> The first four and last Ip address of subnet  cannot be assigned
+
+
+for eg  10  0   0   0 / 16
+        10  0   0   0    - > network address
+        10  0   0   1    - > Reserved by AWS for the vpc router
+        10  0   0   2    - > Reserved by AWS  The ip address of DNS server
+        10  0   0   3    - > Reserved for future use
+        10  0   0   255  - > Broadcast address
+
+Note - Aws do not support broadcast in a vpc but reserve this address
+
+
+
+

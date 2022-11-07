@@ -1,0 +1,189 @@
+IP Addressing
+
+2 types of addressing
+    Physical Addressing
+        mac address
+        48 bits
+
+    Logical Addressing
+        ip addressing
+            ipv4
+                public ip address
+                private ip address
+            ipv6
+
+
+
+
+IPv4
+    internet protocol
+
+
+32 bit logical address
+    4 octet
+    0 - 255
+
+    Ip address -> network id  + Host Id
+    192.168.39.240
+
+    4 octets -> each 8 bits
+
+    eg
+        20 100 200 15
+        145 160 20 250
+
+
+    Classes in IP address
+        class A ---->   1.0.0.0 to 126.0.0.0
+        class B ---->   128.0.0.0 to 191.255.0.0
+        class C ---->   192.0.0.0 to 223.255.255.0
+        class D ---->   224  - 239    generally used to multicast
+        class E ---->   240  - 255  - research
+
+        127 is reserved for special purpose -- Loop Back Address - 127.0.0.0
+
+
+
+
+Example
+
+Identify class of Ip address:
+    137 20 20 10  - 137 lies in class B range
+
+    201 100 10 0  -  201 lies in class C range
+
+    15 200 200 200 - 15 lies in class A range
+
+
+What is network id of ip address
+    (N for network id and H for host id)
+    Class A  ->  N   H  H   H
+
+    Class B  ->  N  N   H   H
+
+    Class C  ->  N  N   N   H
+
+
+    Network bit represented with 1
+    Host bit represented with 0
+
+    115 10 0 15  -- class A (so first octet)
+    115 0 0 0  - network id
+
+    196 10 10 10 -- class C (so three octet reserve)
+    196 10 10 0 - network id
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Tell Subnet Mask of ip address
+
+    115         10  10  20    ----- class A ip address
+    network       host
+  11111111      0000000000.....00000
+
+    255        0    0   0    <-------subnet mask
+
+
+    160  10             20  10      -----class B ip address
+     network              host
+ 1111111111111111       00000000....000000
+       255 255          0    0   <-------subnet mask
+
+
+
+
+---------------------------------------------------------------------------------------------------------
+
+
+
+Convert this IP address into Binary
+
+192.168.37.200
+
+
+128 64  32  16   8   4  2   1
+
+1    1   0   0   0   0  0   0   <-- 192
+
+1    0   1   0   1   0  0   0   <-- 168
+
+0    0   1   0   0   1  0   1   <-- 37
+
+1    1   0   0   1   0  0   0   <-- 200
+
+--------------------------------------------------------------------------------------------
+
+
+Private Ip
+
+192  168  70  10
+
+10  10  20 200
+
+172  16  10  10
+
+class A -> 10 0  0  0   <--- private ip  reserved in class A basically used private network / lan
+
+class B -> 172 . 16 X X   - 172  31  X  X  <---- private ip reserved in class B
+
+class C -> 192 X X X   <--- private ip reserved in class C
+
+private ip do not need to purchase it's free
+
+
+---------------------------------------------------------------------------------------------------
+
+
+No of computers that can be connected from 1 Ip address
+
+176 10  0  0   ( It is basically network) it's ip address of class B
+
+its host part is 16 bits
+
+176 10    0  0
+network   host
+
+broadcast id - reserved for special purpose
+
+
+
+Given ip address    150  10 20   30  find network id, broadcast id , no of usable host
+
+150  10    20  30   class B IP
+
+150  10   0    0   - network id
+
+150  10   255  255 - broadcast id
+
+no of usable host or ip address - 2 ka power 16 - 2 = 65534 number of computers can be configured
+
+
+
+---------------------------------------------------------------------------------
+
+calculate network id, broadcast id and number of usable host or ip addresses
+
+11 200 200 200
+
+11 200 200 200 - class
+
+11 0 0 0 - network id
+
+11 255 255 255 - broadcast id
+
+usable ip addresses - 2 ka power 24  - 2 = 2^24 - 2
+
+
+
+--------------------------------------------------------------------------------------
+
+0 - 127 - part of class A range
+but practically 127 cannot be utilized
+
+
+
+
+
+

@@ -1,0 +1,49 @@
+AWS Lambda Function Configuration
+
+-> A lambda function consist of code and any associated dependencies
+-> In addition, a lambda function also has configuration associated with it
+-> Initially, you specify the configuration information when you create a lambda function
+-> Lambda provides an API for you to update some of the configuration data
+
+
+Lambda Function configuration information includes the following key elements:
+-> Compute resource that you need
+you only specify the amount of memory you want to allocate from your lambda function
+
+-> Aws lambda allocates , CPU power proportional to the memory by using the same ratio as a general purpose amazon ec2 instance type
+such as M3 type
+
+-> You can update the configuration and request additional memory in 64 MB increments from 128MB to 3008 MB
+
+-> Functions larger than 1536 MB are allocated multiple CPU threads
+
+---------------------------------------------
+
+Maximum Execution Timeout
+
+-> you pay for the AWS resources that are used to run your lambda function
+-> To prevent your lambda function from running indefinitely, you specify a timeout
+-> When specified timeout is reached, AWS lambda terminates your function
+-> Default is 3 seconds and max is 900 seconds(15 minutes)
+
+
+-------------------------------------------------------
+
+IAM Role
+
+This is the role that AWS lambda assume when it executes the lambda on your behalf
+
+-------------------------------------------------
+
+AWS Lambda Function - Services it can access
+
+Lambda functions can access -
+
+- AWS services or Non-AWS services(services running on Ec2 instance)
+- AWS services running in AWS VPC (eg -> redshift, RDS instance, ElasticCache)
+- Non-AWS services running on Ec2 instances in AWS VPC
+- AWS Lambda run your function code securely within a VPC by default
+- However, to enable your lambda function to access resources inside your private VPC , you must provide additional
+VPC - specific configuration information that includes VPC subnet id and security group IDs.
+
+

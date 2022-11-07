@@ -1,0 +1,29 @@
+Router
+
+
+Also called Implied Router/Logical Router
+
+-> It is the central routing function
+-> It connects the different AZ together and connects the VPC to the internet gateway.
+-> You can have upto 200 Route tables per vpc
+-> You can have upto 50 route entries per route table
+-> Each subnet must be associated with only one Route table at any given time
+-> If you do not specify a subnet to route table association, the subnet will be associated with the default vpc route table
+-> You can also edit the main route table if you need, but you cannot delete main route table
+-> However you can make a custom route table manually.Become the main route table then you can delete the former main, as it is no longer a main route table
+-> You can associate multiple subnets with the same route table
+
+
+
+Internet Gateway
+
+Connects Vpc with internet gateway
+-> An internet gateway is a virtual router that connects a vpc to the internet
+-> Default vpc is already attached with an internet gateway
+-> If you create a new vpc then you must attach the internet gateway in order to access the internet
+-> Ensure that your subnet's route table points to the internet gateway
+-> It performs NAT between your private and public Ipv4 address
+-> It support both ipv4 and ipv6
+
+NAT Gateway
+-> always present in public subnet

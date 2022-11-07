@@ -1,0 +1,55 @@
+Lambda Function Invocation Type
+
+1) Synchronous Invoke(Push)
+2) Asynchronous Invoke (Event)
+3) Poll-based invoke (Pull-based)
+
+
+-----------------------------------
+
+Synchronous invoke are most straight forward way to invoke your lambda function
+In this model, your functions execute immediately when you perform the lambda invoke API call
+- Invocation flag specifies a value of 'RequestResponse'
+- You wait for the function to process the event and return a response
+
+Here is a list of services that invoke lambda function synchronously
+- Elastic load balancer
+- Amazon cognito
+- Cloudfront
+- API Gateway
+- Amazon Lex
+- Kinesis Data Firehose
+
+
+-----------------------------------
+
+Asynchronous Invocation
+- For Asynchronous invocation, lambda places the event in Queue and returns a success response without additional information
+- Lambda queues the event for processing and returns a response immediately
+- You can configure lambda to send an invocation record to another service like SQS,SNS,Lambda,Eventbridge
+
+Here is a list of service that invoke lambda function asynchronously
+- Amazon s3
+- Amazon SNS
+- Simple Email Service
+- Cloud Formation
+- Cloud Watch logs
+- Cloud Watch Events
+- AWS Code Commit
+- AWS Config
+- lambda to lambda
+Does not wait for function2 to finish or response from function2
+
+
+-------------------------------
+
+Poll-Based Invokes
+- This invocation model is designed to allow you to integrate with AWS stream and queue based service with no code
+or server management.
+- Lambda will poll the following service on your behalf, retrieve records and invoke your function
+
+The following are supported services -
+- Amazon kinesis
+- Amazon SQS
+- Amazon DynamoDB streams
+

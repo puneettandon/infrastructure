@@ -1683,7 +1683,8 @@
 	
 		ElasticSearch Analysis
 
-		Text analysis is the process of converting unstructured text, like the body of an email or a product description, into a structured format that’s optimized for search.
+		Text analysis is the process of converting unstructured text, like the body of an email or a product description,
+		into a structured format that’s optimized for search.
 
 
 		Searching - needs to fulfil two important criterias

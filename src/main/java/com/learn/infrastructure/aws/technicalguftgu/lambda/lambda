@@ -1,0 +1,51 @@
+AWS Lambda
+
+-> Aws Lambda is a compute service that lets you run code without provisioning or managing servers.
+-> With aws lambda, you can run code for virtually any type of application or backend service - all with zero administration
+-> Aws lambda manages all the administration it manages -
+    - Provisioning and capacity of the  compute fleet that offers a balance of memory, CPU, network and other resources.
+    - Server and OS maintenance
+    - High availability and automatic scaling
+    - Monitoring fleet health
+    - Applying security patches
+    - Deploying your code
+    - Monitoring and logging your lambda functions
+    - Aws lambda runs your code on high availability compute infrastructure
+
+-> Aws Lambda executes your code only when needed and scales automatically, from a few requests per day to thousand per second.
+-> You pay only for the compute time you consume - no charge when your code is not running
+-> All you need to do is supply your code in the form of one or more lambda functions to Aws lambda, in one of the languages
+   (Currently it supports nodejs,java,python, C#,Ruby,Powershell and Go) and service can run code on your behalf.
+
+Typically lifecycle for an AWS lambda based application includes authoring code, deploying code to aws lambda and then monitoring and troubleshooting
+
+This is in exchange for flexibility , which means you cannot log into compute instances or customize operating system or language runtime
+
+If you want to manage your own compute, you can use ec2 or elastic beanstalk.
+
+
+---------------------------------------------------------------------------------------
+
+How Lambda works?
+
+-> First you upload your code to lambda in or more lambda function
+-> AWS Lambda will then execute the code in your behalf
+-> After the code is invoked, lambda automatically take care of provisioning and mapping the required servers
+
+
+----------------------------------------------------------------------------------------
+
+
+        AWS Lambda                                                       AWS Ec2
+
+-> It is a platform as a service                                    It is an infrastructure as a service
+-> It supports only limited languages                               No environment restrictions, you can run any code or language
+like nodejs,java,python,go etc
+-> Write your code and push your code into aws lambda               For the first time in ec2 , you have to choose the OS and install all
+                                                                    the software required and then push your code into Ec2
+-> You cannot log into compute instances , choose                   You can select variety of OS, instance type , network and security patches, RAM
+customized OS or language platform                                  and CPU etc
+-> Pay only for duration it run                                     Pay per second, minute, hourly
+
+
+--------------------------------------------------------------------------------------------------

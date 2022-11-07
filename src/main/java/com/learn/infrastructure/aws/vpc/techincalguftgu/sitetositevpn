@@ -1,0 +1,16 @@
+Site To Site VPN
+
+By default, instances that you launch into an Amazon VPC can't communicate with your own network
+To enable the communication you have to establish site to site vpn connection.
+can be data center to office or data center to data center
+
+
+VPN connection - A secure connection between your on-premises equipment and your VPCs
+
+VPN Tunnel - An encrypted link where data can pass from the customer network to or from AWS.
+Each VPN connection includes two VPN tunnels which you can simultaneously use for high availability.
+
+
+Customer Gateway - An AWS resource which provides information to AWS about your customer gateway device
+
+Customer Gateway Device - A physical device or software app on customer side.

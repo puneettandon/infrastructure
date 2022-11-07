@@ -1,7 +1,8 @@
 																ElasticSearch
 
 
-ElasticSearch is a distributed,open source search and analytics engine for all types of data,including textual,numerical,geospatial,structured and unstructured.
+ElasticSearch is a distributed,open source search and analytics engine for all types of data,
+including textual,numerical,geospatial,structured and unstructured.
 Real time distributed and analytics engine
 
 open source developed in java
@@ -16,9 +17,11 @@ Layman Terms -
 
 Why use ElasticSearch?
 
-	Products that involve e-commerce and search engines with huge databases are facing issues,including product information retrieval taking too long.
+	Products that involve e-commerce and search engines with huge databases are facing issues,
+	including product information retrieval taking too long.
 	This leads to poor user experience and in turn turns off potential customers. 
-	Lag in search is attributed to the relational database used for the product design, where the data is scattered among multiple tables - and 
+	Lag in search is attributed to the relational database used for the product design,
+	where the data is scattered among multiple tables - and
 	the successful retrieval of meaningful user information requires fetching the data from these tables. 
 	The Relational database works compartively slowly when it comes to huge data and fetching search results through database queries.
 	Query and Analyze 
@@ -26,7 +29,9 @@ Why use ElasticSearch?
 
 
 What is ES used for ?
-	1. Application Search  2. Website Search  3. Logging and log analytics   4. Geospatial data analysis and visualization  5. Business Analytics
+	1. Application Search  2. Website Search  3. Logging and log analytics
+	4. Geospatial data analysis and visualization
+	5. Business Analytics
 
 Advantages of ES
 	Scalability
@@ -36,20 +41,20 @@ Advantages of ES
 	Document-oriented
 	Autocomplete and instant search
 
-
-
 How does ElasticSearch work
 
 	Raw data flows into ElasticSearch from a variety of sources, including logs,system metrics and web applications
 	Data ingestion is the process by which this raw data is parsed, normalized, and enriched before it is indexed in elasticsearch. 
-	Once indexed in elasticsearch, users can run complex queries against their data and use aggregations to retrieve complex summaries of their data.
+	Once indexed in elasticsearch, users can run complex queries against their data
+	and use aggregations to retrieve complex summaries of their data.
 	From kibana, users can create powerful visualizations of their data,share dashboards and manage elastic stacks
 
 
 Basic concepts of Elasticsearch
 	
 	Cluster
-		A cluster is a collection of one or more servers that together hold entire data and give federated indexing and search capabilities across all nodes(servers).
+		A cluster is a collection of one or more servers that together hold entire data and give federated indexing
+		and search capabilities across all nodes(servers).
 		and is identified by unique name(by default it is elasticsearch)
 		For Relational databases, the node is DB instance. There can be N nodes with the same cluster name. 
 

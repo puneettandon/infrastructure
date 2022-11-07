@@ -1,0 +1,21 @@
+Nat Gateway
+
+-> You can use a network address translation gateway to enable instances in a private subnet to connect to the internet or other AWS services,but
+prevent internet from initiating a connection with those instances.
+NAT Gateway ----- use only Elastic IP
+
+public subnet - basically host website instance / application instances
+private subnet - basically host databases instances
+
+NAT stays in public subnet
+
+-> You are charged for creating and using a NAT gateway in your account.NAT Gateway hourly usage and data processing rates apply
+Amazon EC2 charges for data transfer also apply
+
+-> To create a NAT gateway, you must specify the public subnet in which the NAT Gateway should reside
+-> You must also specify an Elastic IP address to associate with NAT Gateway when you create it
+-> No need to assign public IP address to your private instances in private subnet
+
+-> After you have created a NAT Gateway you must update the route table associated with one or more of your private subnets to point internet.
+Bound traffic to the NAT Gateway.This enables instances in your     private subnet to communicate with the internet
+-> Deleting a NAT Gateway , disassociates its elastic IP address , but does not release the address from your account

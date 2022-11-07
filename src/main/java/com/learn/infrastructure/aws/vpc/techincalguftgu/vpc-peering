@@ -1,0 +1,17 @@
+VPC Peering
+
+
+VPC Peering connection is a networking connection between two vpc that enables you to route traffic between them using
+private ipv4 addresses or ipv6 addresses.
+
+-> Instances in either vpc can communicate with each other as if they are within the same network
+-> you can create a vpc peering connection between your own vpc ,or with vpc in another aws account.
+The VPC can be in different region
+
+Transitive Peering
+not possible
+
+vpcA-vpcB peering
+vpcB-vpcC peering
+then vpcA-vpcC not possible
+

@@ -1,0 +1,338 @@
+Elasticsearch — Documents aggregations
+
+https://medium.com/betacom/elasticsearch-documents-aggregations-8000d0433302
+
+Metric aggregations
+Elasticsearch organizes aggregations into three categories:
+
+metric aggregations that are ways to group and extract statistics and summaries from field values;
+bucket aggregations that group documents into buckets based on field values, ranges, or other criteria;
+pipeline aggregations that take input from other aggregations instead of documents or fields.
+
+
+First of all, we should to create a new index for all the examples we will go through. It will be named “order”
+and you can defined using the request available here. Its documents will have the following fields:
+
+“purchased_at”: order timestamp,
+“lines”: array of objects representing the amount and quantity ordered for each product of the order
+and containing the fields “product_id”, “amount” and “quantity”,
+“total_amount”: total amount of products ordered,
+“salesman”: object containing “id” and “name” of the salesman,
+“sales_channel”: where the order was purchased (store, app, web, etc),
+status: current status of the order (processed, completed, etc).
+
+
+The next step is to index some documents. You can do so with the request available here.
+
+The basic structure of an aggregation request in Elasticsearch is the following:
+
+GET /indexName/_search
+{
+  "aggs": {
+    "aggregationName": { # name we will also see in the results
+      "aggregationType": {
+        … # specifics setting based on the aggregation we choose
+      }
+    }
+  }
+}
+
+As a first example, we would like to use the cardinality aggregation in order to know the the total number of salesman.
+We could achieve this by running the following request:
+
+
+GET /order/_search
+{
+  "size": 0,
+  "aggs": {
+    "total_salesmen": {
+      "cardinality": {
+        "field": "salesman.id"
+      }
+    }
+  }
+}
+
+
+Bucket aggregations
+The bucket aggregation is used to create document buckets based on some criteria. We can identify the resulting buckets with the “key” field. This would be useful if we wanted to look for distributions in our data. It is closely related to the GROUP BY clause in SQL.
+
+For example, we can create buckets of orders that have the “status” field equal to a specific value:
+
+GET /order/_search
+{
+  "size": 0,
+  "aggs": {
+    "status_terms": {
+      "terms": {
+        "field": "status",
+        "order": {
+          "_key": "asc"
+        }
+      }
+    }
+  }
+}
+
+Note that if there are documents with missing or null value for the field used to aggregate,
+we can set a key name to create a bucket with them: "missing": "missingName".
+
+We can specify a minimum number of documents in order for a bucket to be created.
+It is equal to 1 by default and can be modified by the min_doc_count parameter.
+
+We can also specify how to order the results: "order": { "key": "asc" }.
+
+
+This kind of aggregation needs to be handled with care, because the document count might not be accurate:
+since Elasticsearch is distributed by design, the coordinating node interrogates all the shards and gets the top results from each of them.
+In the case of unbalanced document distribution between shards, this could lead to approximate results.
+To better understand, suppose we have the following number of documents per product in each shard:
+aggregations-1.png
+
+Imagine that the search engine only looked at the top 3 results from each shards, even though by default each shard returns the top 10 results. The bucket aggregation response would then contain a mismatch in some cases:
+aggreagations-2.png
+
+
+As a consequence of this behaviour, Elasticsearch provides us with two new keys into the query results:
+
+doc_count_error_upper_bound which represents the upper bound of the error on the document counts for each term,
+sum_other_doc_count which is the sum of the document counts for all buckets which are not shown in the response.
+Another thing we may need is to define buckets based on a given rule,
+similarly to what we would obtain in SQL by filtering the result of a GROUP BY query with a WHERE clause.
+For example we can place documents into buckets based on weather the order status is “cancelled” or “completed”:
+
+GET /order/_search
+{
+  "size": 0,
+  "aggs": {
+    "my_filter": {
+      "filters": {
+        "filters": {
+          "cancelled_orders": {
+            "match": {
+              "status": "cancelled"
+            }
+          },
+          "completed_orders": {
+            "match": {
+              "status": "completed"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+It is then possible to add an aggregation at the same level of the first “filters”:
+
+GET /order/_search
+{
+  "size": 0,
+  "aggs": {
+    "my_filter": {
+      "filters": {
+        "filters": {
+          "cancelled_orders": {
+            "match": {
+              "status": "cancelled"
+            }
+          },
+          "completed_orders": {
+            "match": {
+              "status": "completed"
+            }
+          }
+        }
+      },
+      "aggs": {
+        "avg_total_amount": {
+          "avg": {
+            "field": "total_amount"
+          }
+        }
+      }
+    }
+  }
+}
+
+
+Sub-aggregations
+In Elasticsearch it is possible to perform sub-aggregations as well by only nesting them into our request:
+
+GET /order/_search
+{
+  "size": 0,
+  "aggs": {
+    "status_terms": {
+      "terms": {
+        "field": "status"
+      },
+      "aggs": {
+        "status_stats": {
+          "stats": {
+            "field": "total_amount"
+          }
+        }
+      }
+    }
+  }
+}
+
+What we did was to create buckets using the “status” field and then retrieve statistics for each set of orders via the stats aggregation.
+
+Note that we can add all the queries we need to filter the documents before performing aggregation.
+For example, the last request can be executed only on the orders which have the “total_amount” value greater than 100:
+
+GET /order/_search
+{
+  "size": 0,
+  "query": {
+    "range": {
+      "total_amount": {
+        "gte": 100
+      }
+    }
+  },
+  "aggs": {
+    "status_terms": {
+      "terms": {
+        "field": "status"
+      },
+      "aggs": {
+        "status_stats": {
+          "stats": {
+            "field": "total_amount"
+          }
+        }
+      }
+    }
+  }
+}
+
+Range aggregations
+There are two types of range aggregation, range and date_range, which are both used to define buckets using range criteria.
+The date_range is dedicated to the date type and allows date math expressions.
+
+An example of range aggregation could be to aggregate orders based on their “total_amount” value:
+
+GET /order/_search
+{
+  "size": 0,
+  "aggs": {
+    "amount_distribution": {
+      "range": {
+        "field": "total_amount",
+        "ranges": [
+          {
+            "to": 50
+          },
+          {
+            "from": 50,
+            "to": 100
+          },
+          {
+            "from": 100
+          }
+        ]
+      }
+    }
+  }
+}
+
+
+
+
+The bucket name is shown in the response as the “key” field of each bucket.
+You can set the keyed parameter of the range aggregation to true in order to see the bucket name as the key of each object.
+You can also specify a name for each bucket with "key": "bucketName" into the objects contained in the ranges array of the aggregation.
+
+Note that the from value used in the request is included in the bucket, whereas the to value is excluded from it.
+
+The date_range aggregation has the same structure as the range one, but allows date math expressions.
+Let’s divide orders based on the purchase date and set the date format to “yyyy-MM-dd”:
+
+
+GET /order/_search
+{
+  "size": 0,
+  "aggs": {
+    "purchased_ranges": {
+      "date_range": {
+        "field": "purchased_at",
+        "format": "yyyy-MM-dd",
+        "keyed": true,
+        "ranges": [
+          {
+            "from": "2016-01-01",
+            "to": "2016-01-01||+6M"
+          },
+          {
+            "from": "2016-01-01||+6M",
+            "to": "2016-01-01||+1y"
+          }
+        ]
+      }
+    }
+  }
+}
+
+Global aggregations
+We already discussed that if there is a query before an aggregation, the latter will only be executed on the query results. Nevertheless, the global aggregation is a way to break out of the aggregation context and aggregate all documents, even though there was a query before it.
+
+The structure is very simple and the same as before:
+
+GET /indexName/_search
+{
+  "query": { … },
+  "size": 0,
+  "aggs": {
+    "aggName1": {
+      "global": { },
+      "aggs": {
+        "aggName2": { … }
+      }
+    }
+  }
+}
+
+
+Missing field values
+The missing aggregation creates a bucket of all documents that have a missing or null field value:
+
+GET /indexName/_search
+{
+  "size": 0,
+  "aggs": {
+    "missingAggName": {
+      "missing": {
+        "field": "fieldName"
+      }
+    }
+  }
+}
+Nested aggregations
+We can aggregate nested objects as well via the nested aggregation.
+For example, let’s look for the maximum value of the “amount” field which is in the nested objects contained in the “lines” field:
+
+GET /order/_search
+{
+  "size": 0,
+  "aggs": {
+    "linesAgg": {
+      "nested": {
+        "path": "lines"
+      },
+      "aggs": {
+        "maxAmount": {
+          "max": {
+            "field": "lines.amount"
+          }
+        }
+      }
+    }
+  }
+}
+
+
+

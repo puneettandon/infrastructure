@@ -1,0 +1,253 @@
+Introduction to Analysis and analyzers in Elasticsearch
+
+https://medium.com/elasticsearch/introduction-to-analysis-and-analyzers-in-elasticsearch-4cf24d49ddab
+
+1. Analyzing Process Explain
+
+In order to understand the analyzing process and the need for it in Elasticsearch,
+we need to have a little more deeper look into the inverted index creation in Elasticsearch.
+What we have discussed in the blog 01 of phase 02, about the inverted index creation was a basic version,
+here let me add some intricacies to the inverted index creation scenario.
+
+When we index these documents to Elasticsearch the flow of process is like below:
+see img - document-to-inverted-index-process
+
+1.1 Character filters
+The character filter has the ability to perform addition,removal or replacement actions on the input text given to them.
+To understand it more clearly, if the input strings contains a misspelled word recurring and we need to replace it with the correct one,
+we can use character filters for the same. One of the most common applications of this filter is to strip down the html tags from the input text.
+
+Let us see the working of the character filter using the Analyze API of Elasticsearch.
+Here we are going to remove the html tags from a text with the character filter named “html_strip” . The curl request for that is as below:
+
+curl -XPOST 'localhost:9200/_analyze?pretty' -H 'Content-Type: application/json' -d '{
+  "tokenizer": "standard",
+  "char_filter": [
+    "html_strip"
+  ],
+  "text": "The <b> Auto-generation </b> is a success"
+}'
+
+The resulting tokens are like below:
+
+“The”,”Auto”,”generation”,”is”,”a”,”success”
+
+
+
+Here we can see there are no html tags in the tokens. Likewise try out the above curl request
+without the “char_filter”:[“html_strip”] and see the difference.
+
+
+1.2 Tokenizer
+The input text after its transformation from the Character filter is passed to the tokeniser.
+The tokenizer would split this input text into individual tokens (or terms) at specific characters.
+The default tokenizer in elasticsearch is the “standard tokeniser”, which uses the grammar based tokenisation technique,
+which can be extended not only to English but also many other languages.
+
+Let us see one example for a standard tokeniser below:
+curl -XPOST ‘localhost:9200/_analyze?pretty’ -H ‘Content-Type: application/json’ -d '{
+ “tokenizer”: “standard”,
+ “text”: “The Auto-generation is a success”
+}'
+
+In the response, you can see the text is broken into below tokens:
+
+“The”,”Auto”,”generation”,”is”,”a”,”success”
+
+Note: There are different types of tokenizers for different purposes. In some use cases we might not need splitting at special characters,
+like in the case of an email id or a url, so in order to cater such needs tokenizers like “UAX URL Email Tokenizer” are available for our disposal.
+The list of tokenizers supplied by Elasticsearch can be found here
+
+
+1.3. Token filter
+After the input text is split into tokens/terms, it is handed over to the final stage of analysis, the token filtering.
+Token filters can act on the tokens generated from the tokenizers and modify,add, or remove them. Let us try a token filter with the above example.
+The token filter we are going to try out here is the lowercase token filter, which will lower case all the tokens coming into it.
+The following curl request uses the analyze API for demonstrating the same:
+
+curl -XPOST 'localhost:9200/_analyze?pretty' -H 'Content-Type: application/json' -d'{
+  "tokenizer": "standard",
+  "filter": [
+    "lowercase"
+  ],
+  "text": "The Auto-generation is a success"
+}'
+
+The tokens generated in the response is seen as below:
+
+“the”,”auto”,”generation”,”is”,”a”,”success”
+
+
+Notice that every token in now lowercased. This is what the lowercase token filter does to the tokens.
+
+For a list of the token filters that comes with Elasticsearch, visit the link here
+
+One of the most common use cases of token filters in Elasticsearch is to add synonyms to a word. This essentially means,
+a word can be mapped to its synonyms by using this filter and whenever we search for the synonyms, the document containing the base word will appear.
+
+
+2. Analyzers
+The process of analyzing the contents of fields in documents by Elasticsearch was explained in the above section.
+As it is mentioned in the above section, there are several kinds of Character filters, tokenizers and token filters available
+and we are supposed to choose them wisely according to the use case we are encountering.
+The combination of these three components (character filters,tokenizers and token filters) are called as Analyzers.
+There are several types of built in Analysers available in Elasticsearch for dealing with the most common use cases.
+For example, the Standard Analyzer, the default analyser of Elasticsearch, is a combination of a standard tokenizer
+and two token filters (standard token filter, lowercase and stop token filter). Likewise a wide variety of analyzers are possible depending
+on the combinations of the char filters, tokenizers and token filters.
+
+The general structure of an analyser is represented below:
+
+We can also make custom analyzers by selecting the required filters and the tokenizer
+
+3. Analysis Phases
+Now that we have a clear picture of what is analysis and what are analyzers,
+let us move in to the two phases of analysis that happens in Elasticsearch, the index time analysis and the search time analysis.
+
+
+3.1 Index time analysis
+Let us consider the following document for indexing
+
+curl -XPOST localhost:9200/testindex-0203/testtype/1 -d '{
+   "text": "My name is Arun"
+}'
+
+
+Since we are not applying an analyzers, Elasticsearch applies the default analyzer “Standard analyzer” on this.
+Let us see the final tokens of the above document, when applied with Standard Analyser, with the help of analyze API
+
+curl -XPOST 'localhost:9200/_analyze?pretty' -H 'Content-Type: application/json' -d'{
+   "analyzer": "standard",
+   "text": "My name is Arun"
+}'
+
+The tokens generated for storing in the inverted index are:
+
+“my”,”name”,”is”,”arun”
+The inverted index will look like the below table:
+
+This entire process happens in the index time and hence the name index time analysis.
+
+3.2 Search time analysis
+Search time analysis, as the name indicates will happen at search time. But there is a difference, that is this analysis occur on the query depending up on which query is used.
+
+3.2.1 Term query — Case 1
+
+Consider the following query:
+
+curl -XPOST localhost:9200/testindex-0203/testtype/_search -d '{
+  “query”: {
+    “term”: {
+      “text”: “name”
+    }
+  }
+}'
+If we run this query against the index “testindex-0203”, it will return the document indexed as the result.
+The token “name” is there in the inverted index and is mapped agains the document 1. So when we search for the term “name”,
+it will look up the inverted index and since the term was found there the corresponding document was fetched as results.
+
+
+3.2.2 Term query — Case 2
+
+Now consider another case with the same “term” query, like below:
+
+curl -XPOST localhost:9200/testindex-0203/testtype/_search -d '{
+  “query”: {
+    “term”: {
+      “text”: “Name”
+    }
+  }
+}'
+Here we query with the same term query, but with a different casing for the search keyword, its now “Name” instead of “name”. Now something intersting happens, this search will not yied us any documents. The reason for this strange behaviour is that “Name” is not existing in the inverted index and hence no documents to show.
+
+So, with the “term” query no analysis is allowed to be done on the search keyword.
+
+3.2.3 Term query — Case 3
+
+Let us consider another case with the term query to see this behaviour, here is the query
+
+curl -XPOST localhost:9200/testindex-0203/testtype/_search -d '{
+  “query”: {
+    “term”: {
+      “text”: “My name”
+    }
+  }
+}'
+In the above case , the search keyword is not analyzed and hence, Elasticsearch is looking for the token “My name” in the inverted index. And since such a term does not exists, elasticsearch will return zero results for the above query too.
+
+This was the case of “term” query in elasticsearch. Let us try a different query called match query and check for the outputs.
+
+3.2.4 Match query — Case 1
+
+Consider the following query:
+
+curl -XPOST localhost:9200/testindex-0203/testtype/_search -d '{
+  “query”: {
+    “match”: {
+      “text”: “name”
+    }
+  }
+}'
+This will give return the response with the indexed document as “name” token exists in the inverted index.
+
+3.2.5 Match query — Case 2
+
+curl -XPOST localhost:9200/testindex-0203/testtype/_search -d '{
+  “query”: {
+    “match”: {
+      “text”: “Name”
+    }
+  }
+}'
+Here, when we used the “term” query for the case 2, it yielded no response. But for match query,
+whatever analysis was applied to the field that is queried (text) at the time of indexing,
+the exact same analysis would done on the search keyword (“Name”)also . This makes the search keyword to undergo the “standard analysis”
+and the search keyword “Name” is changed to “name” (due to lowercase token filter in standard analyzer).
+This new search keyword “name” exists in the inverted index and the response will have the corresponding document too.
+
+3.2.6 Match query — Case 3
+
+curl -XPOST localhost:9200/testindex-0203/testtype/_search -d '{
+  “query”: {
+    “match”: {
+      “text”: “My name”
+    }
+  }
+}'
+Here the search keyword given is “My name” which will transform in to the keywords “my” and “name” upon undergoing the standard analysis.
+Both of these keywords exists in the inverted index and hence return the document as the response.
+
+So, depending on the query type, the search keywords are undergoing the analysis (same as that of the field which is queried up on) during the search time.
+This is called as search time analysis.
+
+Conclusion
+In this blog, I have introduced the very basic components of Analyzers and the types of analysis happening in Elasticsearch.
+In the next blog we wil see how to build our own custom analyzer for a very specific use case.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
