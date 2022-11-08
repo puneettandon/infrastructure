@@ -1,0 +1,27 @@
+Route53
+
+You can use Amazon route53 to register new domains, transfer existing domains, route traffic for your domains
+to your aws and external resources , and monitor the health of your resources
+
+Why named route53
+        DNS  -----> TCP port no. 53
+Domain Name System
+
+DNS resolves domain name into ip address
+
+www.facebook.com -> will be converted to ip address
+
+
+
+Route53 Functions
+-> DNS Management
+-> Traffic Management
+-> Availability Monitoring
+-> Domain Registration
+
+
+AWS - 2 types of domain
+Generic level Domain - .com,.org,.net
+Geographic Level Domain - .cn,.us,.in
+
+

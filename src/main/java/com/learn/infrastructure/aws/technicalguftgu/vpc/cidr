@@ -1,0 +1,56 @@
+What is Classless Addressing?
+
+Here is a concept of blocks.
+-> Block means,if user says to me that I want x amount of ipAddresses ,then I provide him the x amount of ipAddresses.
+Means what ever is the user's demand ,that size of block I provide to the user.
+
+-> But in classful addressing, there is nothing for the user , user says that I want  1000 ipAddresses , so there is no funda of 1000 ipAddresses there.
+May be, if I give class A address, in class A there are 1 crore addresses in my network, so user has demand only 1000 , but it can't fulfil
+his demand as it is if I am following classful addressing.
+
+-> So classless addressing, wastage of Ip Addresses is very less because whatever is the user's demand , a block of that , block means how many
+IpAddresses he wants,I will provide him with only those ipAddresses.because it is handled by IENA(Internet Assigned Number Authority)
+
+-> Block contains - 32 bit ---- blockId and hostId
+
+-> Notation - x.y.z.w/n   <--- mask --- no of bits represent block/network
+
+200.10.20.40/28
+blockId  hostId
+28          4
+
+no of hosts = 2^4 = 16
+
+28 -
+11111111  11111111  11111111  11110000
+255         255        255      240         <----- mask
+
+
+200     10      20         40       /       28
+200     10      20    0010  1000
+--------------------------   -----
+        network bit         host bit
+                            0000
+                        00100000
+200     10      20      32/28   - network  id
+
+
+
+
+AND of ipAddress and subnet mask
+
+255         255        255      240             ->> 240(11110000)
+200          10         20       40             ->>  40(00101000)
+-----------------------------------   AND               00100000 = 32
+200          10         20      32
+
+
+
+---------------------------------------------------------------------------------------
+
+Rules
+
+->  Address should be contiguous
+->  No. of addresses in block must be in power of 2
+->  First address of every block must be divisible with size of block
+
