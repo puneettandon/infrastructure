@@ -1,0 +1,28 @@
+Autoscaling
+
+How Autoscaling works and what are the autoscaling components
+
+Scalability
+Fault Tolerance
+High Availability
+
+
+
+--------------------------------------------
+
+-> Creating group of EC2 instances that can scale up or down  depending on conditions you set
+-> Enable elasticity by scaling horizontally through adding or terminating EC2 instances
+-> Autoscaling ensures that you have the right  number of AWS Ec2 instances for your needs at all time
+-> Autoscaling helps you save cost by cutting down the number of EC2 instances when not needed, and
+scaling out to add more instances only when it is required
+
+-------------------------------------------------------
+
+
+Autoscaling Components
+
+1) Launch Configuration - Like instance type , keypair, AMI, security group
+
+2) Autoscaling Group - Group name, Group size , vpc, subnet, health check period
+
+3) Scaling Policy - Metric Type, Target Value

@@ -1,0 +1,32 @@
+Steps to configure Route53
+
+1) You need to register a domain, this can be Route53, or another DNS Register, but then you connect domain name in that registrar to Route53
+2) Create Hosted zone on route53, this is done automatically if you registered your domain using Route53
+ - Inside the hosted zone you need to create record sets
+
+
+Delegate to Route53
+- This steps connects everything and make it work
+- Connect the domain name to Route53 hosted zone - This is called delegation
+
+- Update your domain registrar with the correct name servers for your Route53 hosted zone
+- No other customer hosted zone will share this delegation set with you
+- Doing this means Route53 DNS Service will be serving DNS traffic for the domain of the hosted zone
+- If you registered domain with a diff registrar , you need to configure the route53 DNS server list in your registrar DNS database for your domain
+
+---------------------------------------------------------------------------------------
+
+If you are using another domain provider and you did all the changes -
+- When you migrate from one DNS provider to another , for an existing domain this change can take upto 48 hours to be
+effective.
+- This is because name server dns records are typically cached across the DNS system globally on the internet for upto 48 hours(TTL) periods
+
+
+-----------------------------------------------
+
+Transferring a domain to Route53
+
+- You can transfer a domain to Route53 if the TLD is included on the following list
+- If the TLD is not included , you can't transfer the domain to Route53
+- For most TLD, you need to get an authorization code from the current registrar to transfer a domain
+

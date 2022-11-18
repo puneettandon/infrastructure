@@ -1,0 +1,38 @@
+Autoscaling in AWS
+
+-> If Autoscaling finds that the number of EC2 instances launched by AutoScalingGroup into subject AZs is not balanced.(EC2 instances are not
+evenly distributed ) Autoscaling do re-balancing activity by itself.
+-> As always tries to balance the instances distribution across the AZs
+-> While re-balancing, Autoscaling group launches new EC2 instances where there are less EC2 at present, and then terminates EC2 from AZ,
+that has more instances
+
+
+What causes Imbalance of EC2
+-> If we add or remove some subnets/AZ from AutoScalingGroup
+-> If we manually request for EC2 termination from our ASG.
+-> An AZ that did not enough EC2 capacity now has enough Capacity and it is one of our ASG.
+
+------------------------------------------------------------------------------------------
+
+
+-> We can attach a running EC2 instances to an Autoscaling Group by using AWS console or cli, if the below conditions are met-
+
+    - Instances must be in running state (Not terminated or stopped)
+    - AMI used to launch the EC2 still exist
+    - Instance is not part of another ASG
+    - Instance is in the same AZ of the same group
+    EC2 and ASG  - same group
+
+-> If the existing EC2 instances under the ASG,plus the one to be needed, exceed the max. capacity of the ASG,
+the request will fail , EC2 instance would not be added
+
+
+----------------------------------------------------------------------------------
+
+-> You can manually remove EC2 instances from an Autoscaling group using AWS console or cli
+-> You can then manage the detached instances independently or attach it to another ASG
+-> When you detach an instance, you have the option to decrement the ASG desired capacity
+-> If you don't , the ASG will launch another instance to replace the one detached
+
+-> When you delete an ASG,its parameters like maximum, minimum and desired capacity are all set to zero.Hence it terminates all its EC2 instances
+-> If you want to keep the EC2 instances and manage them independently, you can manually detach them first , then delete the ASG

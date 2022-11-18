@@ -1,0 +1,47 @@
+Route53 Part -2
+
+Route53 performs three main functions:-
+1) Register a domain
+2) As a DNS,it routes internet traffic to the resources for your domain
+3) Check the health of your resources
+
+- Route53 sends automated requests over the internet to a resource (can be a webserver) to verify that the server is reachable,
+functional or available
+
+- Also you can choose to receive
+
+- You can use Route53 for any combination of these functions :
+
+    for eg: You can use Route53 both to register your domain and to route internet traffic for the domain
+    - or you can use Route53 to route internet traffic for a domain that you registered with another domain register
+
+
+--------------------------------------------------------------------------------------------------
+
+-> When you register a domain with Route53, the service automatically makes itself the DNS service for the domain by doing the following:
+
+    - It created a hosted zone that has same name as your domain
+    - It assigns a set of four name servers to the hosted zone, unique to the account
+    - When someone uses a browser to access your website ,these name servers inform the browser where to find your resources,
+    such as a web server or an  amazon s3 bucket.
+    - It gets the name servers from the hosted zone and adds them to domain
+
+
+AWS Supports -
+1) Top Level Domains .com, .org, .net
+2) Geographic Top Level Domains .in,.us
+
+-----------------------------------------------------------------------------------
+
+Registering a domain with route53
+- you can register a domain with Route53 if the TLD(Top Level Domain) is included on the supported TLD list
+- If the TLD is not included, you can't register the domain with Route53.
+
+
+
+Using Route53 as your service
+- you can use Route53 as the DNS service for any domain, even if the TLD for the domain is not included on the supported TLD list
+Note - Each Amazon Route53 account is limited to maximum of 500 hosted zone and 10000 resources record sets per hosted zone
+you can increase this limit by requesting to AWS
+
+---------------------------------------------------------------------------------------------
