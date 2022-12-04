@@ -1,0 +1,270 @@
+1. General Purpose Instances
+
+General purpose instances provide a balance of compute, memory and networking resources , and can be used for a variety
+of workloads
+
+                                    3 series in general purpose
+
+
+A series                                M series                                T series
+(medium,
+large)
+        A1                           M4, M5, M5a,  M5ad, M5d                T2, T3   , T3a
+
+    medium, large                       large                          Instances available in four size :  Nano, Small, Medium, Large
+
+
+
+
+A1 - instances
+A1-instances are ideally suited for scale-out workloads that are supported by the Arm Ecosystem
+
+These instances are well suited for the following application
+1) web server
+2) containerized micro services
+3) Caching fleets
+4) Distributed data stores
+5) Application that requires ARM Instruction Set
+
+
+
+M4,M5,M5a,M5ad,M5d
+
+M4 instance
+The new M4 instance features a custom intel xeon E5-2676 v3 Haswell processor optimized specifically for EC2
+
+vCPU -> 2 to 40 (max)
+RAM -  8GB to 160GB(Max)
+Instance Storage -> EBS only
+
+M5,M5a,M5ad,M5d
+These instances provide an ideal cloud infra, offereing a balance of compute memory, and networking resources for a broad range of applications
+
+used in : Gaming server, web server, small and medium databases,
+vcpu - 2 to 96(max)
+RAM -  8 to 384(max)
+instance storage - EBS and NVMe SSD
+
+
+T2, T3 and T3a instances
+These instances provide a baseline level of CPU performance with the ability to burst to a higher level when required by workload.
+- An unlimited instances can sustain high CPU performance for any period of time whenever required
+
+vCPU - 2 to 8
+RAM - 0.5 to 32 GB
+
+
+used for
+1) website and webapp
+2) code repositiories
+3) development , build and test
+4) microservices
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+
+                                    Compute Optimized Instances
+
+
+Compute Optimized Instances are ideal for compute-bound applications that benefit high performance processors
+
+
+Three types are available - C4, C5, C5n, C3(previous instance)
+
+
+C4 -> C4 instances are optimized for compute intensive workload and deliver very cost effective high performance at low price per compute ratio
+
+vCPU - 2 to 36
+storage - EBS only
+RAM - 3.75 to 60 GB
+Network bandwidth - 10Gbps
+
+Uses cases - Webserver, Batch Processing, MMO Gaming
+
+
+
+C5 - C5 instances are optimized for compute - intensive workloads and delivers cost-effective high performance at a low price per compute ratio
+Hypervisor - Powered by AWS nitro system
+
+vCPU - 2 to 72
+RAM - 4 to 192 GB
+Network Bandwidth - upto 25 GBPS
+Storage - EBS only and NVMe SSD
+
+Uses cases - High performance Webserver, Gaming, Video Encoding
+
+Note: C5 support max 25 EBS Volumes
+      C5 uses Elastic Network Adapter
+      C5 uses new EC2 Hypervisor
+
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+
+                                Memory Optimized Instances
+
+
+R series                X series            Z series
+
+Memory optimized instances are designed to deliver fast performance for workloads that process large data sets in memory.
+
+
+R4,R5,R5a,R5ad,R5d
+
+- High performance Relational(MySql) and  and NoSql(Mongodb, Cassandra) databases
+- Distributed Web scale cache stores that provide in-memory caching of key value type data
+- Used in financial services , Hadoop
+
+vCPU - 2 to 96
+RAM - 16 to 768 GB
+Instance Storage - EBS only and NVMe SSD
+
+
+
+X1,X1e
+
+- Well suited for high performance database, Memory intensive enterprise application , Relational Database workload , SAP HANA
+- Electronic Design Automation
+
+vCPU - 4 to 128
+RAM - 122 to 3904 GB
+Instance Storage - SSD
+
+
+
+Z1d Instance
+High Frequency Z1d delivers a sustained all core frequency of upto 4Ghz, the fastest of any cloud instances
+- AWS nitro system , Xeon processor , upto 1.8 TB of instances storage
+vCPU - 2 to 48
+RAM - 16 to 384 GB
+Storage - NVM SSD
+
+Uses cass - Electronic Design Automation and certain databases workloads with high per core licensing cost
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+
+
+                                Storage Optimized Instances
+
+- Storage Optimized instances are designed for workloads that require high , sequential read and write access to very large data sets on local storage
+- They are optimized to deliver tens of thousands of low latency
+- Random I/O operations per second(IOPS) application
+
+
+I series                    D series                    H series
+
+
+D2 instance
+- Well suited for the following -
+  -> Massive Parallel Processing (MPP) data warehouse
+  -> Map Reduce and Hadoop distributed Computing
+  -> Log or data Processing app
+
+vCPU - 4 to 36
+RAM - 30.5 to 244 GB
+Storage - SSD
+
+
+
+H1 Instances
+- This family features upto 16TB of HDD storage based local storage, high disk throughput and balance of compute and memory
+- Well suited for App requiring sequential access to large amounts of data on direct - attached instance storage
+- Application that requires high throughput access to large quantities of data
+vCPU - 8 to 64
+RAM - 32 to 256GB
+Storage - HDD
+
+
+
+I3 and I3en Instances
+- Well suited for youtube , facebook
+- High frequency online transaction processing system (OLTP)
+- Relational Databases
+- NoSql databases
+- Distributed file system
+- Database warehousing application
+
+vCPU - 2 to 96
+RAM - 16 to 768 GB
+Local Storage - NVMe SSD
+Network Performance - 25Gbps to 100 Gbps
+
+Sequential Throughput -
+    Read - 16 GB/s
+    Write - 6.4 GB/s (I3)
+            8 GB/s (I3en)
+
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+                        Accelerated Computing Instances
+
+
+P series                    G series                    F series
+
+
+Accelerated Computing instance families use hardware accelerators, or co -processors to perform some functions such as floating point number calculation,
+graphics processing or data pattern matching more efficiently   than is possible in software running on CPUs.
+
+
+
+F1 instance
+- F1 instance offers customizable hardware acceleration with field programmable gate arrays(FPGA)
+- Each FPGA contains 2.5 million logic elements and 6800 DSP engines
+- Designed to accelerate computationally intensive algorithms, such as data flow or highly parallel operations
+- F1 provides local NVM SSD storage
+vCPU - 8 to 64
+FPGA - 1 to 8
+RAM - 122 to 976 GB
+Storage - NVMe SSD
+used in  - Genomics, Research , Financial Analytics , Real time video processing and Big data search
+
+
+P2 and P3 instances
+- It uses NVIDIA Tesla GPUs
+- Provides high bandwidth networking
+- Upto - 32GB of memory which makes them ideal for deep learning and computational fluid dynamics
+
+P2 instance
+vCPU - 4 to 64
+GPU - 1 to 16
+RAM - 61 to 732 GB
+GPU RAM - 12 to 192 GB
+Network BW - 25 Gbps
+
+P3 instance
+vCPU - 8 to 96
+GPU - 1 to 8
+RAM  - 61 to 768 GB
+Storage - SSD and EBS
+
+Used in -
+Machine Learning , Databases
+Seismic Analysis, Genomics , Molecular Modeling,AI Deep learning
+
+Note - P3 support CUDA9 and openCL Apis.
+P2 supports CUDA8 and OpenCl 1.2
+
+
+
+
+G2 and G3 instances
+Optimized for Graphics intensive application
+- Well suited for app like 3D visualization
+- G3 instances use NVIDIA Testa M60 GPU and provide cost effective , high performance platform for graphics applications
+vCPU - 4 to 64
+GPU - 1 to 4
+RAM - 30.5 to 488 GB
+GPU Memory - 8 to 32 GB
+Network Performance -  25 Gbps
+
+Used in - Video Creation Services , 3D visualization , streaming graphics-intensive application
+
+--------------------------------------------------------------------------------------------------------------------
+
+
+
