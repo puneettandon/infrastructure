@@ -1,0 +1,66 @@
+Deep-Dive on S3 Security & IAM
+
+    1. How would you securely share an S3 object with a third party?
+        - Use pre-signed URLs (temporary access).
+        - Set up Bucket Policies with limited permissions.
+        - Enable AWS Transfer Family (for managed file transfers).
+
+    2. What is the difference between an S3 Bucket Policy and an IAM Policy?
+        - Bucket Policy: Applied at the bucket level, affects all objects.
+        - IAM Policy: Applied at the user/role level, defines who can access what.
+
+    3. What is the impact of enabling "Block Public Access" on an S3 bucket?
+        - It prevents public access overrides, even if an object is made public.
+
+Advanced S3 Performance & Optimization
+
+    1. How does S3 handle high request rates for large-scale applications?
+        - S3 supports horizontal scaling and automatically scales requests.
+        - Using object key prefixes improves performance (avoid sequential naming like file1, file2,...).
+
+    2. What is Multipart Upload, and when should you use it?
+        - Splits large files (>100MB) into smaller chunks and uploads them in parallel.
+        - Improves upload efficiency and allows resumable uploads.
+
+    3. How does S3 Transfer Acceleration work?
+        - Uses AWS Edge Locations (CloudFront) to speed up global uploads.
+
+
+Real-World S3 Implementation Scenarios
+
+    1. How would you design a highly available, cost-efficient data storage system using S3?
+        - Store frequently accessed data in S3 Standard.
+        - Move older data to S3 Infrequent Access (IA) after 30 days.
+        - Archive historical data in S3 Glacier after 90 days.
+        - Use Lifecycle Policies for automation.
+
+    2. How would you enable real-time processing of new files uploaded to an S3 bucket?
+        - Use S3 Event Notifications to trigger:
+        - Lambda Function → Process images (e.g., thumbnails, resizing).
+        - SNS/SQS → Notify a downstream service.
+
+
+Disaster Recovery & Cross-Region Replication
+
+    1. What is the difference between S3 Cross-Region Replication (CRR) and Same-Region Replication (SRR)?
+        - CRR: Replicates data to another AWS Region for disaster recovery.
+        - SRR: Replicates data within the same region (useful for compliance).
+
+    2. How do you ensure that deleted objects in the source bucket are also deleted in the replicated bucket?
+        - Enable Delete Marker Replication in S3 CRR settings.
+
+
+Cost Optimization & Billing
+
+    1. How can you reduce S3 costs for large-scale data storage?
+        - Enable Intelligent-Tiering to move rarely accessed objects to cheaper storage.
+        - Use Glacier Deep Archive for long-term archives.
+        - Delete unnecessary old versions when Versioning is enabled.
+
+    2. How does AWS charge for S3?
+        Based on:
+            - Storage usage (GB stored per month).
+            - Data transfer (outbound).
+            - Number of requests (GET, PUT, LIST, DELETE).
+            - Cross-region replication fees.
+
