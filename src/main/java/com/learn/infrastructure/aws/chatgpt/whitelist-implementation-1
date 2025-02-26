@@ -1,0 +1,170 @@
+Implementing Whitelisting in AWS
+    Let's walk through how to implement whitelisting in AWS across different services using Security Groups, API Gateway, S3, IAM, and AWS WAF.
+
+1. Whitelisting in AWS Security Groups (EC2)
+    Use Case: Allow SSH (Port 22) only from a specific IP address.
+    Step 1: Create a Security Group
+        aws ec2 create-security-group --group-name WhitelistSG \
+        --description "Security group for whitelisting specific IPs"
+    Step 2: Allow Only a Specific IP for SSH
+        aws ec2 authorize-security-group-ingress --group-id sg-12345 \
+        --protocol tcp --port 22 --cidr 203.0.113.0/32
+        Explanation:
+            - This allows only 203.0.113.0 to SSH into the EC2 instance.
+            - All other IPs will be blocked by default.
+
+    Step 3: Attach the Security Group to an EC2 Instance
+        aws ec2 modify-instance-attribute --instance-id i-0123456789abcdef0 \
+        --groups sg-12345
+      Done! Now only the whitelisted IP can access SSH.
+
+
+2. Whitelisting in API Gateway
+    Use Case: Restrict API access to approved IPs only.
+    Step 1: Define a Whitelist Policy
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Principal": "*",
+              "Action": "execute-api:Invoke",
+              "Resource": "arn:aws:apigateway:us-east-1::/restapis/xyz123",
+              "Condition": {
+                "NotIpAddress": {
+                  "aws:SourceIp": [
+                    "203.0.113.0/32",
+                    "192.168.1.1/32"
+                  ]
+                }
+              }
+            }
+          ]
+        }
+    Explanation:
+        - This denies access to all IPs except those explicitly listed.
+
+    Step 2: Apply the Policy to API Gateway
+        aws apigateway update-rest-api \
+        --rest-api-id xyz123 \
+        --patch-operations op=replace,path=/policy,value=file://policy.json
+      Done! Now only the whitelisted IPs can access your API.
+
+
+3. Whitelisting S3 Bucket Access
+    - Use Case: Allow access to an S3 bucket only from specific IPs.
+    Step 1: Create an S3 Bucket Policy
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Principal": "*",
+              "Action": "s3:*",
+              "Resource": "arn:aws:s3:::my-bucket/*",
+              "Condition": {
+                "NotIpAddress": {
+                  "aws:SourceIp": [
+                    "203.0.113.0/32"
+                  ]
+                }
+              }
+            }
+          ]
+        }
+    Step 2: Apply the Policy to the S3 Bucket
+        aws s3api put-bucket-policy --bucket my-bucket --policy file://s3-policy.json
+    Now, only the whitelisted IP (203.0.113.0) can access this S3 bucket.
+    Done! All other users will be denied.
+
+4. Whitelisting IAM Role Access
+    - Use Case: Restrict an IAM role to specific source IPs only.
+    Step 1: Define IAM Policy for IP Whitelisting
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "*",
+              "Resource": "*",
+              "Condition": {
+                "NotIpAddress": {
+                  "aws:SourceIp": "203.0.113.0/32"
+                }
+              }
+            }
+          ]
+        }
+    Step 2: Apply the Policy to the IAM User/Role
+        aws iam put-user-policy --user-name myUser \
+        --policy-name RestrictToIP --policy-document file://iam-policy.json
+    Only users from 203.0.113.0 can use this IAM role.
+    Done! IAM actions are now restricted to a whitelisted IP.
+
+
+5. Whitelisting in AWS WAF (For Websites & Applications)
+    Use Case: Allow website access only to whitelisted IPs.
+    Step 1: Create an AWS WAF WebACL
+        aws waf create-ip-set --name "AllowedIPs" --scope REGIONAL \
+        --addresses "203.0.113.0/32"
+    Step 2: Attach the WAF Rule to an ALB (Application Load Balancer)
+        aws wafv2 associate-web-acl --web-acl-arn arn:aws:waf::acl-id \
+        --resource-arn arn:aws:elasticloadbalancing:us-east-1:lb/ALB-Name
+    Now, only whitelisted IPs can access the ALB.
+    Done! Your web app is now protected by whitelisting.
+
+
+6. Automating Whitelisting with AWS Lambda
+    Use Case: Automate adding IPs to a whitelist dynamically.
+    Step 1: Create a Lambda Function to Update Security Groups
+        import boto3
+
+        ec2 = boto3.client('ec2')
+
+        def lambda_handler(event, context):
+            security_group_id = 'sg-12345'
+            new_ip = event['ip'] + "/32"
+
+            response = ec2.authorize_security_group_ingress(
+                GroupId=security_group_id,
+                IpPermissions=[
+                    {
+                        'IpProtocol': 'tcp',
+                        'FromPort': 22,
+                        'ToPort': 22,
+                        'IpRanges': [{'CidrIp': new_ip}]
+                    }
+                ]
+            )
+            return {"status": "success", "ip_added": new_ip}
+    Step 2: Invoke Lambda to Add an IP
+        {
+          "ip": "203.0.114.0"
+        }
+    Now, new IPs can be added dynamically to the whitelist.
+    Done! You now have a self-updating whitelist.
+
+
+7. Monitoring & Logging Whitelisted Access
+    - Use AWS CloudTrail for Tracking Whitelisted Actions
+        aws cloudtrail create-trail --name WhitelistMonitoring \
+        --s3-bucket-name my-whitelist-logs
+    CloudTrail logs all access attempts, including blocked ones.
+    Done! Now, you can audit all whitelist changes.
+
+
+8. Best Practices for Whitelisting
+    -  Use IAM policies to restrict access based on roles
+    -  Automate IP whitelisting using Lambda
+    -  Regularly update whitelist policies
+    -  Use AWS WAF for web application protection
+    -  Enable logging & monitoring using CloudTrail and CloudWatch
+
+9.Summary Table: AWS Whitelisting Methods
+        AWS Service	                Whitelisting Method	                            Implementation Command/Policy
+        EC2 Security        Groups	Whitelist specific IPs	                aws ec2 authorize-security-group-ingress
+        API Gateway	        Restrict API access	                                        API Gateway IAM Policy
+        S3 Buckets	        Allow access only to certain IPs	                            S3 Bucket Policy
+        IAM Roles	        Restrict IAM actions to specific IPs	                        IAM Policy
+        AWS WAF	            Block all except allowed IPs	                            aws waf create-ip-set
+        Lambda	            Automate IP whitelisting	                                    Python Boto3

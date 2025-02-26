@@ -1,0 +1,45 @@
+1. How would you design a high-availability e-commerce website on AWS?
+    Key Considerations:
+        - Scalability → Handle traffic spikes (e.g., Black Friday sales)
+        - Fault Tolerance → No single point of failure
+        - Performance → Fast user experience
+        - Security → Protect customer data
+
+    AWS Architecture Components:
+        Compute:
+          - Use EC2 Auto Scaling with an Application Load Balancer (ALB).
+          - Use ECS/EKS for microservices-based architecture.
+          - Lambda for serverless event handling (e.g., order processing).
+
+        Database:
+          - Use Amazon RDS (Aurora MySQL/PostgreSQL) for transactional data.
+          - ElastiCache (Redis) for caching frequently accessed data.
+          - DynamoDB for NoSQL requirements (e.g., user sessions, product catalog).
+
+        Storage & CDN:
+          - S3 + CloudFront for hosting product images, videos, and static content.
+
+        Security & Compliance:
+          - WAF (Web Application Firewall) to prevent DDoS attacks.
+          - IAM Roles & Policies for least privilege access.
+          - AWS Shield for advanced security against attacks.
+
+        Monitoring & Logging:
+          - CloudWatch for performance monitoring.
+          - AWS X-Ray for tracing requests through the application.
+          - AWS Config for compliance tracking.
+
+        Disaster Recovery:
+          - Deploy across multiple Availability Zones (Multi-AZ RDS, Auto Scaling in multiple AZs).
+          - Cross-Region Replication in S3 for backups.
+          - Route 53 with health checks for failover.
+
+
+    Final Architecture:
+        Frontend: S3 + CloudFront
+        Backend: EC2/EKS + ALB
+        Database: Aurora (Multi-AZ) + ElastiCache
+        Storage: S3 for assets
+        Security: WAF, Shield, IAM
+        Monitoring: CloudWatch, X-Ray
+        DR: Multi-AZ + Route 53 failover

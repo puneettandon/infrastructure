@@ -1,0 +1,5 @@
+How would you design a cost-optimized AWS architecture?
+    - Use Auto Scaling to scale down during low traffic.
+    - Use Spot Instances for batch jobs & flexible workloads.
+    - Use S3 Lifecycle Policies to move old data to Glacier.
+    - Use Reserved Instances for long-term stable workloads.

@@ -1,0 +1,33 @@
+How do you scale an application that serves millions of users?
+
+    Key Considerations:
+        Traffic Scaling
+        Database Scaling
+        Compute Scaling
+
+    AWS Architecture Components:
+        1. Compute Scaling:
+            Use Auto Scaling Groups (ASG) with EC2.
+            Use EKS or ECS with Fargate for containerized apps.
+            Use Lambda for event-driven tasks.
+
+        2. Database Scaling:
+            RDS Read Replicas for high read traffic.
+            Aurora Auto Scaling to handle database load.
+            DynamoDB with on-demand scaling for NoSQL.
+
+        3. Traffic Optimization:
+            CloudFront CDN to cache static assets.
+            ElastiCache (Redis) to reduce database queries.
+            API Gateway + Lambda for microservices API.
+
+        4. Security & Resilience:
+            WAF & Shield for DDoS protection.
+            Multi-AZ Deployments to prevent failure.
+
+    Final Architecture:
+        Frontend: S3 + CloudFront
+        Compute: ECS/EKS + Auto Scaling
+        Database: RDS (Read Replicas) + ElastiCache
+        Security: WAF, Shield, IAM
+        Scaling: Auto Scaling, Aurora Scaling

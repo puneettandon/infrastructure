@@ -1,0 +1,148 @@
+Amazon EC2 (Elastic Compute Cloud) - Complete Guide
+
+What is Amazon EC2?
+    Amazon Elastic Compute Cloud (EC2) is a scalable virtual machine (VM) service that provides resizable compute capacity in the cloud.
+    Key Features:
+        - On-Demand, Scalable Compute Power
+        - Multiple Instance Types for Different Workloads
+        - Auto Scaling for Performance Optimization
+        - Flexible Pricing Models (On-Demand, Reserved, Spot)
+        - Secure Networking and Access Control
+
+
+Core Concepts of EC2
+    a) EC2 Instances
+        An EC2 Instance is a virtual server in AWS. It runs applications just like a physical machine but with AWS cloud advantages.
+    b) EC2 AMI (Amazon Machine Image)
+        An AMI (Amazon Machine Image) is a pre-configured virtual machine template containing:
+            - OS (Linux, Windows, etc.)
+            - Software Packages
+            - Application Data & Configurations
+        Example: You can use an Ubuntu AMI to launch an EC2 instance with pre-installed web server software.
+
+    c) Instance Types
+        AWS EC2 provides different instance types optimized for different workloads.
+            Category	                    Use Case	                             Examples
+            General Purpose	            Balanced CPU & Memory	                    t3.micro, m5.large
+            Compute Optimized	        High CPU workloads	                        c5.large, c6g.medium
+            Memory Optimized	        Large in-memory databases	                r5.large, x1.32xlarge
+            Storage Optimized	        High-speed SSD storage	                    i3.large, d2.8xlarge
+            GPU Instances	            AI/ML, Gaming, Rendering	                g4dn.xlarge, p3.16xlarge
+
+
+    Best Practice:
+    Choose an instance type based on your application's CPU, memory, and storage needs.
+
+
+Hands-on: Launching an EC2 Instance
+    Step 1: Go to AWS EC2 Console
+    Step 2: Click on "Launch Instance"
+    Step 3: Select an Amazon Machine Image (AMI) (e.g., Ubuntu, Windows)
+    Step 4: Choose an Instance Type (t2.micro for free tier)
+    Step 5: Configure Security Group (Allow SSH, HTTP/HTTPS)
+    Step 6: Create or Select an SSH Key Pair
+    Step 7: Click Launch and Connect via SSH
+
+    ssh -i my-key.pem ubuntu@your-ec2-public-ip
+
+
+EC2 Networking & Security
+    a) Security Groups (SG)
+        - Acts as a firewall to control inbound/outbound traffic.
+        Example:
+            - Allow SSH (port 22) for remote login.
+            - Allow HTTP (port 80) for web traffic.
+    b) Elastic IP
+        - Static public IP address for EC2 instances.
+        - Useful for applications needing a fixed IP.
+    c) Virtual Private Cloud (VPC)
+        - Every EC2 instance runs inside a VPC (Virtual Private Cloud).
+        - Subnets are used to segment EC2 instances.
+        Example: Place a web server in Public Subnet and a database in Private Subnet for security.
+
+
+
+EC2 Storage Options
+    a) Amazon EBS (Elastic Block Store)
+        - Block storage attached to EC2 instances.
+        - Can be detached & reattached to other instances.
+        - Types:
+            - gp3 (General Purpose SSD) – Balanced cost and performance.
+            - io2 (Provisioned IOPS SSD) – High-performance database workloads.
+            - st1 (HDD) – Big data and log processing.
+    b) Amazon EFS (Elastic File System)
+        - Shared storage across multiple EC2 instances.
+        - Used for scalable file storage.
+    c) Instance Store
+        - Ephemeral storage that is lost when the instance stops.
+
+    Best Practice: Use EBS for persistent storage and EFS for shared data.
+
+
+EC2 Auto Scaling
+    Automatically scales instances based on traffic.
+    Uses Scaling Policies:
+    Target Tracking (e.g., CPU > 60%)
+    Scheduled Scaling (Scale at specific times)
+    Manual Scaling (Manually adjust the number of instances)
+
+    Example:
+    An e-commerce website scales EC2 instances during peak hours and reduces them during low traffic.
+
+
+
+EC2 Load Balancing
+    AWS Elastic Load Balancer (ELB) distributes traffic among multiple EC2 instances.
+    Types of Load Balancers:
+        - Application Load Balancer (ALB) → HTTP/HTTPS-based
+        - Network Load Balancer (NLB) → High-performance, TCP-based
+        - Classic Load Balancer (CLB) → Older version, now mostly replaced
+        Example:
+            - A website with multiple EC2 instances behind an ALB to handle traffic
+
+
+
+EC2 Pricing Models
+    a) On-Demand Instances
+        - Pay per second/minute
+        - No long-term commitments
+        - Best for short-term workloads
+
+    b) Reserved Instances
+        - Up to 75% discount on long-term usage
+        - Best for steady workloads
+        - 1-year or 3-year commitment
+    c) Spot Instances
+        - 90% cheaper than On-Demand
+        - Can be terminated by AWS when demand increases
+        - Best for batch jobs, ML training
+    d) Dedicated Hosts
+        - Physical server dedicated to your organization
+        - Useful for software licensing compliance
+    Cost Optimization Tip:
+        - Use Auto Scaling with Spot Instances for cost savings.
+
+
+
+Real-World Use Cases for EC2
+    1. Web Hosting
+        - Run Apache/Nginx web servers.
+        - Host PHP, Python, Node.js applications.
+    2. Database Hosting
+        - Run MySQL, PostgreSQL, MongoDB on EC2.
+        - Use EBS snapshots for backups.
+    3. Machine Learning & Big Data
+        - Use GPU-based EC2 instances (p3.16xlarge) for AI training.
+        - Process logs with Spark on EC2.
+    4. Video Streaming
+        - Use EC2 instances for encoding and live streaming.
+        - Combine with Amazon CloudFront for faster delivery.
+
+
+EC2 Security Best Practices
+    - Use IAM Roles instead of embedding credentials in instances.
+    - Enable Security Groups to restrict access.
+    - Use Elastic Load Balancer for DDoS protection.
+    - Enable CloudWatch Monitoring for performance insights.
+    - Regularly update OS & patches for security.
+

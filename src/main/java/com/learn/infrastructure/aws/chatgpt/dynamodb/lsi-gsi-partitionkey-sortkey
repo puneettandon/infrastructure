@@ -1,0 +1,203 @@
+ LSI (Local Secondary Index) is not the same as the Partition Key (ID), but it is closely related.
+
+Difference Between LSI & Partition Key
+    Feature	                    Partition Key (ID)	                                     Local Secondary Index (LSI)
+    Definition	            The main key used to distribute                 A secondary index that enables alternate
+                              data across partitions.	                     queries within the same partition.
+    Uniqueness	            Must be unique for each item.	                Can contain duplicate values across items.
+    Scope	                The partition key is used globally              LSIs allow querying within a partition
+                           to distribute data across DynamoDB nodes.	        using a different attribute.
+    Sort Key Requirement   Optional (needed only for composite keys).	    Requires a Sort Key, as it allows alternate                                                                                     sorting.
+    Storage	                Stores the actual record.	              A different way to look up records within a partition.
+
+
+
+2. When to Use an LSI?
+    LSI is useful when:  You need multiple sorting options for items within the same Partition Key.
+        - You want to filter data efficiently within a partition.
+        - You need faster queries without scanning the entire table.
+    Example Use Case:
+        You have an Orders Table where:
+            Partition Key → UserID
+            Sort Key → OrderDate
+            LSI on OrderStatus → Allows filtering orders by status (Pending, Shipped, Delivered).
+
+
+
+3. Example: Orders Table with LSI
+        UserID (Partition Key)	            OrderDate (Sort Key)	            OrderStatus (LSI)	Amount
+                U123	                    2024-01-10	                        Pending	            $50
+                U123	                    2024-01-12	                        Shipped         	$100
+                U123	                    2024-02-01	                        Delivered	        $80
+
+        Query 1: Get all orders for UserID "U123" sorted by Date
+            aws dynamodb query \
+              --table-name Orders \
+              --key-condition-expression "UserID = :user" \
+              --expression-attribute-values '{ ":user": {"S": "U123"} }'
+
+            Returns: All orders for U123, sorted by OrderDate.
+
+        Query 2: Get all "Shipped" orders for UserID "U123"
+            aws dynamodb query \
+              --table-name Orders \
+              --index-name OrderStatusIndex \
+              --key-condition-expression "UserID = :user AND OrderStatus = :status" \
+              --expression-attribute-values '{ ":user": {"S": "U123"}, ":status": {"S": "Shipped"} }'
+
+            Returns: Only orders with Shipped status.
+
+
+4. Key Differences Between LSI and GSI
+        Feature	            LSI (Local Secondary Index)	                            GSI (Global Secondary Index)
+        Partition Key	    Uses the same Partition Key as the main table.	            Uses a different Partition Key.
+        Query Scope	        Queries within a partition.	                                Queries across all partitions.
+        Use Case	        Need multiple sorting/filtering                             Need alternate ways
+                                options within a partition.	                                to access data globally.
+        Example:
+            - Use LSI if you need to fetch all orders for a user, but sorted by status.
+            - Use GSI if you need to fetch all orders, regardless of UserID, based on status.
+
+
+
+    LSI is NOT the same as a Partition Key.
+        - LSI allows querying a table in an alternate way within the same Partition Key.
+        - LSI is always used with a Sort Key, while a Partition Key may or may not have one.
+        Best Practice: Use LSI for sorting within a partition and GSI for global lookups.
+
+
+
+-------------------------------------------------
+
+
+Partition Key + Sort Key is NOT the same as LSI (Local Secondary Index). However, they are related. Let’s break this down clearly.
+
+
+
+Difference Between "Partition Key + Sort Key" and LSI
+        Feature	        Partition Key + Sort Key (Table Schema)	                Local Secondary Index (LSI)
+        Definition	    A primary key structure used to uniquely            An alternate indexing mechanism that
+                        identify items in a table.	                         allows querying with a different sort key                                                          within the same partition.
+        Scope	        Defines how data is stored in DynamoDB.	            Provides a different way to query data within a                                                                     partition.
+        Partition Key	Required (Unique identifier for each partition).	Same Partition Key as the base table.
+        Sort Key	    Required (Used for range queries).	                Different sort key than the table's primary key.
+        Use Case	    Retrieves records based on the primary              Allows querying using an alternate
+                        partition key and sort key.	                         sort key within the same partition.
+        Key Takeaway:
+            A table can have a Partition Key + Sort Key (Composite Key).
+            An LSI provides an additional way to query data within the same partition using a different sort key.
+
+
+
+--------------------------------------------------------------------------------------
+
+
+You can have multiple Local Secondary Indexes (LSIs) in DynamoDB. However, there is a limit of 5 LSIs per table.
+
+1. How Multiple LSIs Work
+        LSIs allow querying the same Partition Key with different Sort Keys.
+        They provide multiple ways to retrieve and sort data within a partition.
+        LSIs are useful when you need alternative sorting/filtering options without scanning the entire table.
+    Example Use Case:
+        Imagine an Orders Table where:
+            - Partition Key: UserID
+            - Sort Key (Main Table): OrderDate
+            - LSI 1: OrderStatusIndex (Sort Key: OrderStatus)
+            - LSI 2: TotalAmountIndex (Sort Key: TotalAmount)
+
+        UserID (Partition Key)	    OrderDate (Sort Key)	        OrderStatus	            TotalAmount
+            U123	                    2024-01-10	                    Pending	                50
+            U123	                    2024-01-12	                    Shipped	                100
+            U123	                    2024-02-01	                    Delivered	            80
+
+        The main table sorts orders by OrderDate.
+        LSI 1 allows filtering orders by OrderStatus.
+        LSI 2 allows sorting orders by TotalAmount.
+
+2. Creating Multiple LSIs
+    Step 1: Create Table with Partition + Sort Key
+        aws dynamodb create-table \
+          --table-name Orders \
+          --attribute-definitions \
+            AttributeName=UserID,AttributeType=S \
+            AttributeName=OrderDate,AttributeType=S \
+            AttributeName=OrderStatus,AttributeType=S \
+            AttributeName=TotalAmount,AttributeType=N \
+          --key-schema \
+            AttributeName=UserID,KeyType=HASH \
+            AttributeName=OrderDate,KeyType=RANGE \
+          --billing-mode PAY_PER_REQUEST
+    This table uses OrderDate as the main Sort Key.
+
+    Step 2: Add Two LSIs
+        aws dynamodb update-table \
+          --table-name Orders \
+          --local-secondary-index-updates '[
+            {
+              "Create": {
+                "IndexName": "OrderStatusIndex",
+                "KeySchema": [
+                  { "AttributeName": "UserID", "KeyType": "HASH" },
+                  { "AttributeName": "OrderStatus", "KeyType": "RANGE" }
+                ],
+                "Projection": { "ProjectionType": "ALL" }
+              }
+            },
+            {
+              "Create": {
+                "IndexName": "TotalAmountIndex",
+                "KeySchema": [
+                  { "AttributeName": "UserID", "KeyType": "HASH" },
+                  { "AttributeName": "TotalAmount", "KeyType": "RANGE" }
+                ],
+                "Projection": { "ProjectionType": "ALL" }
+              }
+            }
+          ]'
+    This creates two LSIs:
+        - OrderStatusIndex → Allows querying by OrderStatus within UserID.
+        - TotalAmountIndex → Allows sorting orders by TotalAmount.
+
+3. Querying Multiple LSIs
+
+    Query by Order Status (Using LSI)
+        aws dynamodb query \
+          --table-name Orders \
+          --index-name OrderStatusIndex \
+          --key-condition-expression "UserID = :user AND OrderStatus = :status" \
+          --expression-attribute-values '{ ":user": {"S": "U123"}, ":status": {"S": "Shipped"} }'
+      Fetches all "Shipped" orders for U123.
+
+    Query by Total Amount (Using LSI)
+        aws dynamodb query \
+          --table-name Orders \
+          --index-name TotalAmountIndex \
+          --key-condition-expression "UserID = :user" \
+          --scan-index-forward false \
+          --expression-attribute-values '{ ":user": {"S": "U123"} }'
+      Fetches all orders sorted by TotalAmount in descending order.
+
+
+4. Best Practices for Using Multiple LSIs
+    - Limit LSIs to 5 per table (AWS restriction).
+    - Use LSIs when you frequently query the same Partition Key with different Sort Keys.
+    - LSIs must be defined at table creation time; they cannot be added later.
+    - LSIs increase write costs because DynamoDB writes to both the main table and the LSI indexes.
+
+5️. LSI vs GSI (Comparison)
+    Feature	                    Local Secondary Index (LSI)	                    Global Secondary Index (GSI)
+    Partition Key	            Must be the same as the base table.	           Can use a different partition key.
+    Sort Key	                Allows querying with a different sort key      Allows querying across
+                                    within the same partition.	                     all partitions.
+    Scalability	                Limited by the partition size.	               Scales independently of the base table.
+    Write Cost	                Higher due to index updates.	               Higher but can be optimized using                                                                                            projections.
+
+   Use LSI for sorting/filtering within a partition and GSI for searching across partitions.
+
+
+
+Yes, DynamoDB allows multiple LSIs (up to 5 per table).
+Each LSI provides an alternative Sort Key within the same Partition Key.
+LSIs must be created during table creation and cannot be added later.
+LSIs help optimize queries but come with extra write costs.
+
