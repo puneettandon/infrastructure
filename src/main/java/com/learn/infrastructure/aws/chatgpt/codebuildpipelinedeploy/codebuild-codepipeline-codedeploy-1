@@ -1,0 +1,90 @@
+The CI/CD Trio: What Each AWS Service Does
+
+    | Service          | Purpose                               | Think of it as...          |
+    | ---------------- | ------------------------------------- | -------------------------- |
+    | **CodePipeline** | Orchestrates the entire pipeline      | The **conductor** of CI/CD |
+    | **CodeBuild**    | Compiles, tests, packages your code   | The **builder**            |
+    | **CodeDeploy**   | Deploys the built artifact to targets | The **delivery agent**     |
+
+
+
+High-Level Explanation
+
+     1. CodePipeline – The Orchestrator
+        A fully managed CI/CD service to automate build, test, and deploy phases.
+            - Automates the flow from source → build → test → deploy
+            - Can use GitHub, S3, CodeCommit as source
+            - Integrates with CodeBuild, CodeDeploy, Lambda, etc.
+
+        You define stages like:
+            [ Source ] → [ Build ] → [ Test ] → [ Deploy ]
+
+
+     2. CodeBuild – The Builder
+        A fully managed build service that compiles source code, runs tests, and produces artifacts.
+            - Runs your buildspec.yml
+            - No servers to manage
+            - You pay only for the build minutes used
+
+        Example buildspec.yml:
+            version: 0.2
+            phases:
+              build:
+                commands:
+                  - mvn clean package
+            artifacts:
+              files:
+                - target/my-app.jar
+
+
+
+     3. CodeDeploy – The Deployer
+        Automates deployment of your application to EC2, Lambda, or ECS.
+            - Uses appspec.yml for deployment instructions
+            - Supports:
+                - EC2 (Blue/Green, in-place)
+                - ECS (Docker containers)
+                - Lambda (function version shift)
+
+        Example appspec.yml:
+            version: 0.0
+            os: linux
+            files:
+              - source: /
+                destination: /home/ec2-user/app
+            hooks:
+              AfterInstall:
+                - location: scripts/restart.sh
+
+
+
+How They Work Together
+      [ GitHub / S3 ]            <- Source
+            ↓
+      [ CodePipeline ]           <- Triggers flow
+            ↓
+      [ CodeBuild ]              <- Compiles and builds artifact
+            ↓
+      [ S3 / Artifact Store ]
+            ↓
+      [ CodeDeploy ]             <- Deploys to EC2 / ECS / Lambda
+
+
+
+Real-World Example
+    You push code to GitHub →
+        1. CodePipeline detects the change
+        2. Triggers CodeBuild to:
+            - Run tests
+            - Package the app into a .zip or .jar
+        3. CodeBuild uploads artifact to S3
+        4. CodeDeploy deploys the artifact to your EC2 instances using deployment hooks
+
+
+Summary
+    | Component        | What it does                             | Key Files                             |
+    | ---------------- | ---------------------------------------- | ------------------------------------- |
+    | **CodePipeline** | Automates CI/CD flow                     | pipeline config (via console or YAML) |
+    | **CodeBuild**    | Compiles code and generates artifacts    | `buildspec.yml`                       |
+    | **CodeDeploy**   | Deploys to targets like EC2, ECS, Lambda | `appspec.yml`                         |
+

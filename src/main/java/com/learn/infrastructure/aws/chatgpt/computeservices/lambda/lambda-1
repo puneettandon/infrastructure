@@ -1,0 +1,102 @@
+AWS Lambda – Complete Guide
+
+1.What is AWS Lambda?
+    AWS Lambda is a serverless compute service that allows you to run code without provisioning or managing servers. It automatically scales and bills you only for execution time.
+    Key Features:
+        - Event-driven execution (Triggers from S3, DynamoDB, API Gateway, etc.)
+        - Automatic scaling (No need to configure servers)
+        - Pay-per-use billing (Billed for execution time, not idle time)
+        - Supports multiple languages (Python, Java, Node.js, Go, .NET, Ruby)
+
+
+Core Concepts of AWS Lambda
+    a) Function, Event, and Context
+        - Function: The code you write to execute.
+        - Event: The trigger that invokes the Lambda function.
+        - Context: Provides metadata about the invocation, execution time, and request details.
+        Example:
+            A Lambda function that resizes images when uploaded to an S3 bucket.
+
+    b) Triggers & Event Sources
+    Lambda functions can be triggered by various AWS services:
+        - S3 → Process uploaded files
+        - DynamoDB → React to database changes
+        - API Gateway → Build serverless APIs
+        - CloudWatch Events → Schedule periodic jobs
+        - SQS & SNS → Handle messages asynchronously
+        Example Use Case:
+            - When a file is uploaded to S3, Lambda resizes it and stores a thumbnail in another bucket.
+            - When a DynamoDB table changes, Lambda processes the update and logs it.
+
+    c) Lambda Execution Environment
+        - Runs in an AWS-managed container.
+        - Provides up to 15 minutes of execution time.
+        - Supports environment variables and IAM roles.
+
+    d) Memory & Compute Configuration
+        - Memory: 128MB to 10GB (affects CPU power)
+        - Execution timeout: 1ms to 15 minutes
+        - Ephemeral disk storage (/tmp): 512MB to 10GB (for temporary files)
+        - Concurrency: Default limit is 1000 per region (can be increased)
+
+    e) Lambda Deployment Package
+    Lambda code can be deployed as:
+        - ZIP file (For Python, Java, Node.js, etc.)
+        - Container Image (For large applications, supports up to 10GB)
+        - Inline Code (For simple functions in Python, JavaScript)
+
+
+AWS Lambda Pricing Model
+    AWS Lambda pricing is based on:
+        - Number of requests (First 1 million requests are free, then $0.20 per 1M requests)
+        - Execution time (Billed in milliseconds based on memory allocated)
+        - Network Transfer Costs (Free within AWS, but data transfer out is charged)
+        Cost Optimization Tips
+            - Use Provisioned Concurrency for consistent performance.
+            - Set Memory & Timeout limits based on real needs.
+            - Combine multiple small Lambda functions to reduce cold start issues.
+
+
+Real-World Applications of AWS Lambda
+    1. Serverless APIs
+        - Use Case: Build a fully serverless API with API Gateway + Lambda + DynamoDB.
+        - A product catalog API where Lambda fetches product details from DynamoDB.
+    2. Automated File Processing
+        - Use Case: Process images, videos, or logs.
+        - Example: When a user uploads an image to S3, Lambda automatically resizes and stores it.
+    3. Event-Driven Workflows
+        - Use Case: Trigger Lambda on database changes.
+        - Example: A new entry in DynamoDB triggers Lambda to send an email notification.
+    4. Scheduled Tasks (Cron Jobs)
+        - Use Case: Automate periodic tasks without an EC2 server.
+        - Example: A Lambda function that deletes old S3 files every week (Triggered by CloudWatch Events).
+    5. Data Processing & Analytics
+        - Use Case: Real-time data processing.
+        - Example: Lambda processes logs from Kinesis Data Streams for analytics.
+
+
+Advanced Lambda Topics
+    a) Cold Start & Performance Optimization
+        - Cold Start: When Lambda runs after a period of inactivity, it takes extra time to initialize.
+    Ways to Reduce Cold Starts: ✔ Use Provisioned Concurrency to keep Lambda warm.
+        - Keep Function Small (Fewer dependencies = Faster startup).
+        - Use Memory Optimization (More memory = Faster execution).
+        - Optimize Package Size (Avoid unnecessary libraries).
+
+
+    b) Lambda with Step Functions
+    AWS Step Functions help orchestrate multiple Lambda executions in a workflow.
+    Use Case Example:
+        Step 1: Lambda fetches data from an API
+        Step 2: Another Lambda processes the data
+        Step 3: Final Lambda stores results in DynamoDB
+
+        Best for: Complex workflows with multiple steps.
+
+    c) Lambda Security Best Practices
+        - Use IAM Roles to restrict access (Least Privilege Principle).
+        - Store secrets in AWS Secrets Manager instead of environment variables.
+        - Enable AWS X-Ray for debugging and monitoring.
+        - Use VPC Endpoint for secure Lambda-to-S3 connections.
+
+

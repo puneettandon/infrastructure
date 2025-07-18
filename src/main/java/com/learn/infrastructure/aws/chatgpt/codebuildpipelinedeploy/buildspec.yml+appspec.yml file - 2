@@ -1,0 +1,97 @@
+A sample buildspec.yml + appspec.yml pair for a real-world Java Spring Boot project being built with Maven and deployed to an EC2 instance using AWS CodeBuild + CodeDeploy.
+
+
+1. buildspec.yml (Used by CodeBuild)
+  This file tells CodeBuild how to build and package your application.
+
+      version: 0.2
+
+      phases:
+        install:
+          commands:
+            - echo Installing Maven...
+            - mvn --version
+        pre_build:
+          commands:
+            - echo Logging in to CodeBuild...
+        build:
+          commands:
+            - echo Building the Java application...
+            - mvn clean package -DskipTests
+        post_build:
+          commands:
+            - echo Build complete. Preparing artifacts...
+            - mkdir -p output
+            - cp target/*.jar output/
+            - cp appspec.yml output/
+            - cp -r scripts/ output/
+
+      artifacts:
+        files:
+          - output/**/*
+
+
+
+  This generates a deployable ZIP containing:
+    target/*.jar, appspec.yml, and the scripts/ folder.
+
+
+
+2. appspec.yml (Used by CodeDeploy)
+    This file defines where to place the artifact and what deployment scripts to run on the EC2 instance.
+
+
+      version: 0.0
+      os: linux
+
+      files:
+        - source: /
+          destination: /home/ec2-user/myapp
+
+      hooks:
+        BeforeInstall:
+          - location: scripts/stop_app.sh
+            timeout: 60
+            runas: ec2-user
+
+        AfterInstall:
+          - location: scripts/install_dependencies.sh
+            timeout: 60
+            runas: ec2-user
+
+        ApplicationStart:
+          - location: scripts/start_app.sh
+            timeout: 60
+            runas: ec2-user
+
+
+
+Sample scripts/ folder contents
+      
+  These are Bash scripts that get executed at different lifecycle stages.
+        
+        scripts/stop_app.sh
+          #!/bin/bash
+          pkill -f myapp.jar || echo "App not running"
+  
+  
+        scripts/install_dependencies.sh
+          #!/bin/bash
+          sudo yum install -y java-17-amazon-corretto || true
+  
+  
+        scripts/start_app.sh
+          #!/bin/bash
+          cd /home/ec2-user/myapp
+          nohup java -jar target/myapp.jar > app.log 2>&1 &
+  
+  
+  
+Summary
+  | File            | Purpose                               |
+  | --------------- | ------------------------------------- |
+  | `buildspec.yml` | Instructions for CodeBuild            |
+  | `appspec.yml`   | Instructions for CodeDeploy           |
+  | `scripts/*.sh`  | Lifecycle scripts (start, stop, etc.) |
+      
+

@@ -1,0 +1,76 @@
+What is Serverless?
+    - Serverless means you don’t manage servers, but that doesn’t mean there are no servers.
+    - Instead, the cloud provider manages the infrastructure — provisioning, scaling, patching, and maintaining the servers behind the scenes.
+
+
+    Think of It Like This:
+        - You focus only on your code or containers
+        - You don’t create or manage EC2 instances (VMs)
+        AWS automatically handles:
+            - Server provisioning
+            - Scaling
+            - Fault tolerance
+            - OS patching
+            - Capacity planning
+
+
+
+Serverless Characteristics
+
+    | Feature                    | What It Means                                               |
+    | -------------------------- | ----------------------------------------------------------- |
+    | **No infrastructure mgmt** | You never launch or patch a server manually                 |
+    | **Auto scaling**           | It scales to zero or to thousands of requests automatically |
+    | **Pay-as-you-go**          | You’re billed only when code runs or containers run         |
+    | **Event-driven**           | Often triggered by events (HTTP, S3 upload, cron, etc.)     |
+    | **Short-lived**            | Best for jobs or services that can start/stop anytime       |
+
+
+
+Examples of Serverless in AWS
+    | AWS Service     | Type       | What You Deploy          |
+    | --------------- | ---------- | ------------------------ |
+    | **Lambda**      | Function   | Your code                |
+    | **Fargate**     | Containers | Your containerized app   |
+    | **API Gateway** | HTTP API   | Your endpoint definition |
+    | **S3**          | Storage    | Upload/download triggers |
+    | **DynamoDB**    | NoSQL DB   | Serverless storage       |
+
+
+Fargate as Serverless
+    With Fargate, you provide:
+        - A container image
+        - CPU + memory configuration
+        - Networking settings
+
+    Then Fargate:
+        - Pulls the image
+        - Launches it on hidden infrastructure
+        - Monitors and scales automatically
+        - Tears it down after job finishes (if desired)
+
+    So you never see a server, yet it runs your app.
+
+
+
+Misconceptions
+    | Myth                               | Truth                                             |
+    | ---------------------------------- | ------------------------------------------------- |
+    | "No servers exist"                 | Servers **do** exist — you just don’t manage them |
+    | "Serverless is only for functions" | No — containers (Fargate) can be serverless too   |
+    | "Serverless means stateless"       | Not always, but stateless apps are better suited  |
+
+
+
+When to Use Serverless
+    Use serverless when you want:
+        - Minimal ops work
+        - Rapid deployments
+        - Auto-scaling without effort
+        - Cost efficiency for bursty or sporadic workloads
+
+
+Summary
+    Serverless = You focus on your business logic. Cloud handles the rest.
+    It’s not about "no servers", but about "no server management."
+

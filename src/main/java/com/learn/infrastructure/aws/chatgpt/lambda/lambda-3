@@ -1,0 +1,65 @@
+Common Ways to Automatically Trigger Lambda
+
+    1. Scheduled (Time-Based) – EventBridge / CloudWatch
+
+        For daily/hourly exports.
+            Setup:
+                Use Amazon EventBridge (previously CloudWatch Events)
+                Create a rule with a cron or rate expression
+                Target = your Lambda function
+
+        Example: Run every day at 8 AM IST
+            cron(30 2 * * ? *)   // UTC time = 8:00 AM IST
+
+        Best for: Daily exports, weekly reports, etc.
+
+
+    2. API Gateway Trigger
+        If you want to trigger export on demand via HTTP request (e.g., from UI or external system).
+            - Lambda is invoked via REST API endpoint.
+            - You can pass parameters like date, type, format, etc.
+
+    3. S3 Event Trigger
+        - Automatically export when a file is uploaded (e.g., trigger export when a config or manifest file is uploaded).
+        Example: Upload a JSON config to s3://your-bucket/exports/config.json to start the export.
+
+
+    4. SQS or SNS Trigger
+        - Trigger export when a message comes in (e.g., from a data pipeline).
+        Best for:
+            Export requests from another system
+            Queue-based decoupling
+            Retry support with DLQ
+
+
+    5. EventBridge Event Bus (Custom Event Triggers)
+        You can emit custom events to EventBridge and trigger Lambda based on patterns like:
+
+            {
+              "source": "myapp.data.export",
+              "detailType": "daily-report",
+              "detail": {
+                "reportType": "summary",
+                "date": "2025-07-18"
+              }
+            }
+
+
+Combined Example:
+    Imagine this setup:
+        - An EventBridge rule triggers the Lambda every day at 6 AM.
+        - The Lambda:
+            - Calls internal APIs.
+            - Generates a CSV report.
+            - Uploads to S3 (exports/daily-report-2025-07-18.csv).
+            - Sends SNS/Slack/Email notification with the download link.
+
+
+Permissions Required
+    Your Lambda's IAM role must have permission to:
+        Invoke APIs (e.g., via VPC, Secrets Manager if needed)
+        Write to S3 (s3:PutObject)
+        Publish to SNS / Send via SES (optional)
+
+
+

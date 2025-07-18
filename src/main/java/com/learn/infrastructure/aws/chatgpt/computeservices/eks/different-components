@@ -1,0 +1,174 @@
+| Tool / Component | Category                | Where It's Used                           | Why / Purpose                                                                 |
+| ---------------- | ----------------------- | ----------------------------------------- | ----------------------------------------------------------------------------- |
+| **ArgoCD**       | GitOps / CI/CD          | CD Layer (manages K8s manifests via Git)  | Automatically syncs manifests from Git to EKS cluster, enables GitOps         |
+| **Komodor**      | Observability / DevOps  | Monitoring & Troubleshooting              | Tracks K8s changes (who changed what), helps with incident debugging          |
+| **Istio**        | Service Mesh            | Between services inside the cluster       | Secure, manage, and observe service-to-service traffic (mTLS, retries, etc.)  |
+| **ConfigMaps**   | K8s Native              | Mounted into pods at runtime              | Inject app configuration without rebuilding containers                        |
+| **HPA**          | K8s Native              | Controls pod replica count dynamically    | Scales pods up/down based on CPU/memory or custom metrics                     |
+| **ELK Stack**    | Observability / Logging | Aggregates logs from all containers/nodes | Centralized log storage, search, and visualization using Elasticsearch/Kibana |
+
+
+In-Cluster Architecture Mapping
+
+    Here’s how they interact in a typical EKS setup:
+
+                                            ┌────────────┐
+                                            │   Git Repo │ <─┐
+                                            └────┬───────┘   │
+                                                 │           │ GitOps
+                                            ┌────▼───────┐   │
+                                            │  ArgoCD    │───┘
+                                            └────────────┘
+                                                 │
+                              ┌──────────────────▼────────────────────┐
+                              │              EKS Cluster              │
+                              │ ┌────────┐  ┌────────┐   ┌──────────┐ │
+                              │ │ Deploy │  │ Deploy │   │ Deploy   │ │
+                              │ │ App A  │  │ App B  │...│ Istio    │ │
+                              │ └────────┘  └────────┘   └──────────┘ │
+                              │     │             │          │        │
+                              │     ▼             ▼          ▼        │
+                              │ ConfigMap     ConfigMap     Sidecars │
+                              │     │             │          │        │
+                              │     ▼             ▼     ┌────▼─────┐  │
+                              │  App Config    App Config │Istio Proxy│ │
+                              │                        └────┬─────┘  │
+                              │                             ▼        │
+                              │                    Traffic Routing   │
+                              │                        (Istio)       │
+                              │                                      │
+                              │ ┌──────────────────────────────────┐ │
+                              │ │     HPA Scaling Pods             │ │
+                              │ └──────────────────────────────────┘ │
+                              │ ┌────────────┐   ┌───────────────┐  │
+                              │ │  Komodor   │   │    FluentBit   │──► Logs
+                              │ └────┬───────┘   └───────────────┘     │
+                              │      ▼                                 ▼
+                              │       Track & Debug            ┌────────────┐
+                              │                                │   ELK      │
+                              └────────────────────────────────► (Elastic,  │
+                                                                 Logstash,  │
+                                                                  Kibana)   │
+                                                                  └─────────┘
+
+
+Detailed Breakdown
+
+    1. ArgoCD – GitOps CD Tool
+        - Where: Outside or inside your EKS cluster (as a Deployment)
+        - Used For: Declarative deployment of K8s resources
+        - Why: Keeps your cluster in sync with Git; auto-rollbacks; auditability
+
+        Example:
+            apiVersion: argoproj.io/v1alpha1
+            kind: Application
+            metadata:
+              name: my-app
+            spec:
+              source:
+                repoURL: https://github.com/my-org/my-repo
+                targetRevision: HEAD
+                path: helm/my-app
+              destination:
+                server: https://kubernetes.default.svc
+                namespace: my-namespace
+              syncPolicy:
+                automated:
+                  prune: true
+                  selfHeal: true
+
+
+
+    2. Komodor – K8s Change Intelligence
+        - Where: Deployed inside the cluster
+        - Used For: Monitoring changes, deployments, restarts, failures
+        - Why: Helpful for devs/SREs to debug incidents quickly
+        Capabilities:
+            - Timeline of events across services
+            - Notifications when pod restarts or config changes
+            - Links to logs, metrics, diffs
+
+
+    3. Istio – Service Mesh
+        - Where: Installed as control plane + sidecars on each pod
+        - Used For: Secure, observe, and control service-to-service traffic
+        Features:
+            - Traffic shifting (A/B testing, canary)
+            - Retry, circuit breakers
+            - Ingress Gateway (replace ALB/NGINX)
+            - mTLS encryption between services
+
+
+    4. ConfigMaps – Kubernetes-native Configuration
+        - Where: Created in cluster and mounted into pods
+        - Used For: Externalizing app configs, without rebuilding containers
+        Example:
+            apiVersion: v1
+            kind: ConfigMap
+            metadata:
+              name: app-config
+            data:
+              DATABASE_URL: jdbc:mysql://db:3306/app
+
+        Mount it in deployment:
+            envFrom:
+              - configMapRef:
+                  name: app-config
+
+
+    5. HPA (Horizontal Pod Autoscaler) – K8s-native Scaling
+        - Where: Runs as a K8s controller in your cluster
+        - Used For: Scaling pod replicas based on metrics
+        Example:
+            apiVersion: autoscaling/v2
+            kind: HorizontalPodAutoscaler
+            metadata:
+              name: my-app-hpa
+            spec:
+              scaleTargetRef:
+                apiVersion: apps/v1
+                kind: Deployment
+                name: my-app
+              minReplicas: 2
+              maxReplicas: 10
+              metrics:
+                - type: Resource
+                  resource:
+                    name: cpu
+                    target:
+                      type: Utilization
+                      averageUtilization: 50
+
+
+    6. ELK (Elasticsearch, Logstash, Kibana) – Centralized Logging
+        - Where: Logs collected via FluentBit or Fluentd in cluster
+        - Used For: Aggregating logs from all containers/pods/nodes
+        Flow:
+            - FluentBit collects stdout/stderr from pods
+            - Sends to Logstash (optional for filtering)
+            - Stored in Elasticsearch
+            - Viewed in Kibana Dashboards
+
+        Example FluentBit config:
+            [INPUT]
+              Name tail
+              Path /var/log/containers/*.log
+
+            [OUTPUT]
+              Name es
+              Host elasticsearch.logging.svc.cluster.local
+              Port 9200
+              Index kube-logs
+
+
+
+
+Summary of Responsibilities
+    | Tool       | Managed By    | Purpose                          | Skill Required |
+    | ---------- | ------------- | -------------------------------- | -------------- |
+    | ArgoCD     | DevOps        | Git-based deployments            | Medium         |
+    | Komodor    | SRE / Devs    | Debug and visibility             | Low-Medium     |
+    | Istio      | Platform team | Traffic management, service mesh | High           |
+    | ConfigMaps | App Dev       | External config                  | Low            |
+    | HPA        | Platform      | Pod auto-scaling                 | Medium         |
+    | ELK        | DevOps / SRE  | Logging and visualization        | Medium-High    |

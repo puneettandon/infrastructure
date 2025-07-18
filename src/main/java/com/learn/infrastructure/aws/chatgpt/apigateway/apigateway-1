@@ -1,0 +1,110 @@
+What is API Gateway?
+
+    Amazon API Gateway is a fully managed service that lets you:
+        - Create, publish, secure, and monitor REST, HTTP, or WebSocket APIs
+        - Acts as the front door for applications to access data or services (like Lambda, EC2, or backend APIs)
+
+
+Types of APIs in API Gateway
+    | API Type                    | Use Case                                                    |
+    | --------------------------- | ----------------------------------------------------------- |
+    | **HTTP API** (lightweight)  | Fast, low-latency APIs (most common for Lambda integration) |
+    | **REST API** (feature-rich) | Full control (throttling, transformations, authorizers)     |
+    | **WebSocket API**           | Real-time 2-way communication (chat, gaming, live data)     |
+
+
+Common API Gateway Use Cases
+    1. Trigger Lambda functions via HTTP
+    2. Proxy requests to internal microservices or EC2
+    3. Transform or validate requests/responses
+    4. Add authentication with IAM, Cognito, or custom auth
+    5. Throttle and monitor API traffic
+
+
+End-to-End: Lambda + API Gateway (Java Example)
+
+    1. Create Lambda Function (e.g., Hello World)
+        public class HelloApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+            @Override
+            public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent event, Context context) {
+                String name = event.getQueryStringParameters().getOrDefault("name", "World");
+                return new APIGatewayProxyResponseEvent()
+                    .withStatusCode(200)
+                    .withBody("Hello, " + name);
+            }
+        }
+
+    2. Create API Gateway (HTTP or REST)
+        HTTP API (Recommended for most cases)
+        Steps:
+            1. Go to API Gateway console → Create HTTP API
+            2. Add Integration → Lambda function
+            3. Define routes (e.g., GET /hello)
+            4. Deploy the API (create a stage like prod)
+            5. Copy the invoke URL and test
+
+        Example:
+            GET https://abcd1234.execute-api.ap-south-1.amazonaws.com/hello?name=Puneet
+
+        REST API
+            More advanced features:
+                - Request/response transformation
+                - Custom domain, usage plans, throttling, API keys
+
+
+    3. Securing the API
+        | Option                 | Use Case                                  |
+        | ---------------------- | ----------------------------------------- |
+        | **API Key**            | Basic usage tracking or monetization      |
+        | **IAM Auth**           | Secure internal APIs with AWS credentials |
+        | **Cognito Authorizer** | Auth via user pools                       |
+        | **Lambda Authorizer**  | Custom token/auth logic                   |
+
+
+
+    4. Testing the API
+        You can test with:
+            Postman / curl
+            Swagger / OpenAPI doc
+            API Gateway console test interface
+
+
+
+Monitoring and Logging
+    | Tool                        | Purpose                                   |
+    | --------------------------- | ----------------------------------------- |
+    | **CloudWatch Logs**         | Logs from Lambda/API Gateway              |
+    | **CloudWatch Metrics**      | # of invocations, errors, latency         |
+    | **X-Ray**                   | Tracing across services                   |
+    | **API Gateway Usage Plans** | Track usage, throttle, set quotas per key |
+
+
+
+Best Practices
+    - Use HTTP API for Lambda-based integrations unless you need advanced features
+    - Add throttling and quotas to protect your backend
+    - Use Stages (dev, prod) with separate endpoints
+    - Enable logging and tracing for debugging
+    - Add custom domain name with SSL using Route53 and ACM
+    - Version your APIs via path or stage
+
+
+Tools for Automation
+    | Tool          | Description                                                 |
+    | ------------- | ----------------------------------------------------------- |
+    | **SAM**       | AWS Serverless Application Model                            |
+    | **CDK**       | Define API + Lambda in code (Java/TS/Python)                |
+    | **Terraform** | Infrastructure as code (also supports Lambda + API Gateway) |
+    | **OpenAPI**   | Define APIs via swagger.json and import into API Gateway    |
+
+
+Real-World Example
+    Build a data export service:
+        Endpoint: POST /export
+        Body: { "reportType": "sales", "date": "2025-07-18" }
+        Triggers Lambda that:
+            Calls internal API
+            Generates CSV
+            Uploads to S3
+            Returns pre-signed S3 link
+

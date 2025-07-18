@@ -1,0 +1,68 @@
+                Amazon EKS (Elastic Kubernetes Service)
+
+What is EKS?
+    - Amazon EKS is a managed Kubernetes service provided by AWS.
+    - You get a fully managed Kubernetes control plane (no need to install or upgrade kube-apiserver, etcd, etc.)
+    - You only manage the worker nodes (or not even those if you use Fargate)
+    - Supports both standard Kubernetes workloads and AWS integrations (IAM, VPC, ALB, CloudWatch)
+
+
+Why Use Kubernetes (and EKS)?
+    Kubernetes Need:
+        - Orchestrate containers at scale
+        - Automate deployment, scaling, and management
+        - Run microservices with isolation and resilience
+        - Support rolling updates, self-healing, and service discovery
+
+    Why EKS Specifically?
+        - Avoid self-managing Kubernetes (infra, upgrades, etc.)
+        - Deep AWS integrations (IAM, ELB, CloudWatch, EBS, RDS)
+        - Secure and scalable, with minimal operational overhead
+
+
+
+EKS Architecture Overview
+
+              ┌────────────────────┐
+              │   EKS Control Plane│   <- Managed by AWS
+              └────────┬───────────┘
+                       │
+            ┌──────────▼──────────────┐
+            │ Worker Nodes (EC2/Fargate)│   <- You manage EC2 OR use Fargate
+            └──────────┬──────────────┘
+                       │
+              ┌────────▼─────────┐
+              │   Kubernetes Pods │
+              └──────────────────┘
+
+
+    Components:
+        - Control Plane: API Server, etcd, controller manager (AWS manages)
+        - Worker Nodes: EC2 or Fargate instances
+        - kubectl CLI to interact
+        - VPC, Security Groups, IAM roles for access and isolation
+        - Cluster Autoscaler, Karpenter, Metrics Server, etc., for scaling
+
+
+
+EKS Setup (Basic Flow)
+    1. Create EKS Cluster
+        Via AWS Console / CLI / Terraform
+    2. Configure kubectl
+        aws eks update-kubeconfig --name <cluster-name>
+    3. Launch Worker Nodes
+        - Managed Node Groups (EC2)
+        - OR use Fargate profiles
+    4. Deploy Your App
+        Create Kubernetes manifests (Deployment, Service, Ingress, etc.)
+    5. Monitor
+        Use CloudWatch, Prometheus, or Grafana
+
+
+
+Summary
+    EKS is ideal if you want to use Kubernetes without managing it yourself. It suits teams with:
+        - containerized apps,
+        - microservices architectures,
+        - need for portability, scalability, and security.
+

@@ -1,0 +1,140 @@
+Here's a complete end-to-end CI/CD flow using:
+
+    1.Jenkins for building the code
+    2.S3 for storing build artifacts
+    3.CodePipeline for orchestration
+    4.CodeDeploy for deployment to EC2
+
+
+High-Level CI/CD Architecture
+
+                 ┌────────────┐
+                 │ Developer
+                 └─────┬──────┘
+            Pushes Code to GitHub
+
+               ┌────────────┐
+               │  Jenkins    (CI)
+               └────┬───────┘
+         Builds project (e.g., Maven/Gradle)
+         Prepares app.zip (includes JAR + appspec.yml + scripts)
+                    |
+          Uploads app.zip to S3 bucket
+
+           ┌────────────────────┐
+           │   S3 (Artifact)
+           └────────┬───────────┘
+                      (Trigger)
+              ┌─────────────┐
+              │ CodePipeline│ (CD Orchestration)
+              └────────┬────┘
+
+                  ┌──────────┐
+                  │CodeDeploy  (Deployment)
+                  └────┬─────┘
+
+            Deploys app to EC2 instances
+
+
+
+
+Components Breakdown
+     Jenkins (CI)
+        - Pulls from GitHub
+        - Builds .jar
+        - Packages appspec.yml + scripts/ + .jar into app.zip
+        - Uploads app.zip to S3 (e.g., my-bucket/releases/app-v1.zip)
+
+
+     S3
+        - Stores versioned deployable artifacts
+        - CodePipeline uses this as source trigger
+
+     CodePipeline
+        - Triggered on S3 upload
+        - Has two stages:
+            - Source (S3)
+            - Deploy (CodeDeploy)
+
+     CodeDeploy
+        - Uses appspec.yml to copy files and run lifecycle scripts on EC2
+        - Works with deployment group targeting tagged EC2 instances
+
+
+
+Artifact Structure (Zip uploaded to S3)
+    app.zip
+    ├── appspec.yml
+    ├── scripts/
+    │   ├── install_dependencies.sh
+    │   ├── start_app.sh
+    │   └── stop_app.sh
+    └── target/
+        └── myapp.jar
+
+
+
+
+Jenkins Script Example
+    #!/bin/bash
+
+    # Build the app
+    mvn clean package -DskipTests
+
+    # Prepare deployment package
+    mkdir -p deploy
+    cp target/myapp.jar deploy/
+    cp appspec.yml deploy/
+    cp -r scripts/ deploy/
+    cd deploy && zip -r app.zip . && cd ..
+
+    # Upload to S3
+    aws s3 cp deploy/app.zip s3://my-deploy-bucket/releases/app-v1.zip
+
+
+    Jenkins runs this via a shell step, or wrap in a Jenkinsfile.
+
+
+
+CodePipeline Setup (Console or YAML)
+    Source Stage:
+        Type: Amazon S3
+        Bucket: my-deploy-bucket
+        Key: releases/app-v1.zip
+        Trigger: Object created (All)
+
+    Deploy Stage:
+        Type: CodeDeploy
+        Application: MyApp
+        Deployment Group: MyDeploymentGroup
+
+
+
+
+IAM Roles Needed
+
+    Jenkins IAM User
+        {
+          "Effect": "Allow",
+          "Action": ["s3:PutObject"],
+          "Resource": "arn:aws:s3:::my-deploy-bucket/releases/*"
+        }
+
+    CodePipeline Role
+        Needs access to S3, CodeDeploy
+
+    CodeDeploy Role
+        Access to EC2, logs, and S3 (for downloading artifact)
+
+
+
+
+Summary: What Each Tool Does
+    | Tool             | Role                                     |
+    | ---------------- | ---------------------------------------- |
+    | **Jenkins**      | CI – builds and uploads to S3            |
+    | **S3**           | Artifact store and CodePipeline trigger  |
+    | **CodePipeline** | CI/CD orchestrator – triggers deployment |
+    | **CodeDeploy**   | Deploys to EC2 using `appspec.yml`       |
+
+

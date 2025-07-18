@@ -1,0 +1,84 @@
+Yes, you can use SNS as part of a daily data export pipeline to customers, but with a specific purpose:
+    - SNS is not used to send the actual data, but to notify systems or users that the data is ready.
+
+
+Typical Use Case: Daily Data Export with SNS
+    Let’s say:
+        - You generate customer data reports daily (CSV, JSON, etc.)
+        - You store them in S3
+        - You want to notify each customer/system that:
+            - Data is ready
+            - Where to fetch it (S3 link or presigned URL)
+
+
+    How SNS Fits Into the Flow
+
+            [1] Data Generator Job (Lambda, ECS, Glue, Step Function)
+                    ↓
+               Generates report (e.g., customer123-report.csv)
+                    ↓
+               Uploads to S3
+                    ↓
+            [2] Publishes SNS message:
+                 "Report ready for customer123: s3://... or presigned URL"
+                    ↓
+            [3] SNS Fan-Out:
+                ├── Email to customer
+                ├── HTTP webhook to external system
+                ├── Trigger another Lambda (e.g., for processing)
+
+
+
+    Real-World Architecture
+
+         ┌─────────────┐
+         │  Scheduled  │
+         │  Lambda Job │
+         └─────┬───────┘
+               ▼
+        Generate daily CSVs
+               ▼
+           Upload to S3
+               ▼
+        Publish SNS Message
+               ▼
+         ┌─────┬─────┬──────┐
+         ▼     ▼     ▼      ▼
+        Email SQS  Webhook  Lambda (push to FTP, etc.)
+
+
+
+
+
+    Why SNS is Useful Here
+        | Benefit                                  | Why It Helps                                   |
+        | ---------------------------------------- | ---------------------------------------------- |
+        | 🔔 Notify multiple targets               | Email users + webhook system + internal Lambda |
+        | 💬 Message contains metadata             | You can include customer name, date, file URL  |
+        | 🔌 Integrates with other AWS services    | Trigger Lambda, SQS queues, external HTTP      |
+        | ✅ Decouples data generation and delivery | Each system can act independently              |
+
+
+Sample SNS Message (JSON)
+
+    {
+      "customer": "Customer123",
+      "date": "2025-07-17",
+      "s3Location": "s3://data-reports/customer123/2025-07-17.csv",
+      "presignedUrl": "https://s3.amazonaws.com/...expires-in-15min"
+    }
+
+
+
+But Don't Use SNS to:
+    | ❌ Action                                   | Why Not                                                |
+    | ------------------------------------------ | ------------------------------------------------------ |
+    | Send large data files                      | SNS is not meant to carry files; use S3 + link sharing |
+    | Guarantee delivery/order                   | Use **SQS + DLQ** if you need guaranteed delivery      |
+    | Store customer-specific messages long term | SNS doesn't persist messages like a database           |
+
+
+Summary
+    Yes, use SNS to notify customers/systems that the data is ready.
+    Combine it with S3 for storage, and optionally SQS or Lambda for downstream automation.
+

@@ -1,4 +1,4 @@
-1. How would you design a high-availability e-commerce website on AWS?
+`1. How would you design a high-availability e-commerce website on AWS?
     Key Considerations:
         - Scalability → Handle traffic spikes (e.g., Black Friday sales)
         - Fault Tolerance → No single point of failure

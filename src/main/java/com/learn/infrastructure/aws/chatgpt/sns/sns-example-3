@@ -1,0 +1,106 @@
+Real working example of using SNS + Lambda to notify customers when their daily data export is ready.
+
+Scenario:
+    - A job generates customer data and uploads it to S3
+    - It publishes a message to SNS
+    - SNS triggers a Lambda, which sends an email to the customer with the download link
+
+
+Architecture
+    [Batch Job or Lambda]
+           ↓
+     Upload report to S3
+           ↓
+     Publish SNS message (with S3 link)
+           ↓
+           SNS Topic
+             ↓
+         Lambda Function
+             ↓
+       Send email to customer (via SES, or logs for testing)
+
+
+
+Step-by-Step Implementation
+
+    1. Create the SNS Topic
+        aws sns create-topic --name customer-data-ready
+
+
+    2. Create the Lambda Function
+        Python Example: send_notification.py
+            import json
+            import boto3
+            import os
+
+            ses = boto3.client('ses')
+
+            def lambda_handler(event, context):
+                for record in event['Records']:
+                    message = json.loads(record['Sns']['Message'])
+
+                    customer_email = message['email']
+                    file_url = message['presignedUrl']
+
+                    subject = f"Your Data Report for {message['date']} is Ready"
+                    body = f"Hi {message['customer']},\n\nYour data report is ready. Download it here:\n\n{file_url}"
+
+                    response = ses.send_email(
+                        Source=os.environ['FROM_EMAIL'],
+                        Destination={'ToAddresses': [customer_email]},
+                        Message={
+                            'Subject': {'Data': subject},
+                            'Body': {
+                                'Text': {'Data': body}
+                            }
+                        }
+                    )
+
+                    print("Email sent! Message ID:", response['MessageId'])
+
+
+    3. Set Lambda Environment Variable
+        FROM_EMAIL: The verified SES sender email (e.g., noreply@yourdomain.com)
+
+
+    4. Add Lambda Permissions for SNS & SES
+        Attach this IAM policy to Lambda:
+            {
+              "Effect": "Allow",
+              "Action": [
+                "ses:SendEmail",
+                "sns:Subscribe"
+              ],
+              "Resource": "*"
+            }
+
+
+    5. Subscribe Lambda to SNS
+        aws sns subscribe \
+          --topic-arn arn:aws:sns:us-east-1:123456789012:customer-data-ready \
+          --protocol lambda \
+          --notification-endpoint arn:aws:lambda:us-east-1:123456789012:function:SendCustomerNotification
+
+
+        Then run:
+            aws lambda add-permission \
+              --function-name SendCustomerNotification \
+              --statement-id sns-invoke \
+              --action "lambda:InvokeFunction" \
+              --principal sns.amazonaws.com \
+              --source-arn arn:aws:sns:us-east-1:123456789012:customer-data-ready
+
+
+    6. Publish a Message from Your Export Job
+        import boto3, json
+
+        sns = boto3.client('sns')
+        sns.publish(
+            TopicArn='arn:aws:sns:us-east-1:123456789012:customer-data-ready',
+            Message=json.dumps({
+                "customer": "Acme Corp",
+                "email": "data@acme.com",
+                "date": "2025-07-17",
+                "presignedUrl": "https://s3.amazonaws.com/yourbucket/customer/acme/report-2025-07-17.csv?..."
+            })
+        )

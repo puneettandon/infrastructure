@@ -1,0 +1,114 @@
+Advanced EKS Topics Breakdown
+
+    1. IAM Roles for Service Accounts (IRSA)
+        - Maps K8s service accounts to IAM roles
+        - Least privilege: Only pods with proper roles can access S3, DynamoDB, etc.
+
+        Flow:
+            - Create IAM role with trust policy for EKS OIDC provider.
+            - Annotate your K8s ServiceAccount with IAM role ARN.
+            - Pod assumes that role when running.
+
+                apiVersion: v1
+                kind: ServiceAccount
+                metadata:
+                  name: s3-access-sa
+                  annotations:
+                    eks.amazonaws.com/role-arn: arn:aws:iam::<account>:role/s3-access-role
+
+
+            Use in your pod:
+                spec:
+                  serviceAccountName: s3-access-sa
+
+
+    2. Managed Node Groups vs Self-Managed vs Fargate
+        | Type                    | Who Manages | Pros                                | Cons                                         |
+        | ----------------------- | ----------- | ----------------------------------- | -------------------------------------------- |
+        | **Managed Node Groups** | AWS         | Easy upgrades, auto-replace         | Less flexibility                             |
+        | **Self-managed EC2**    | You         | Full control                        | You handle drain, upgrade                    |
+        | **Fargate**             | AWS         | No nodes to manage, true serverless | Limited to stateless apps, slower cold start |
+
+
+
+
+    3. Scaling in EKS
+        a. Horizontal Pod Autoscaler (HPA)
+            - Scales pods in a deployment based on CPU/memory or custom metrics.
+        b. Cluster Autoscaler (EC2-based)
+            - Scales node groups if there aren’t enough resources to schedule pods.
+        c. Karpenter (advanced alternative)
+            - Dynamically provisions EC2 spot/on-demand nodes with right sizing
+            - Launches VMs faster than Cluster Autoscaler
+
+
+    4. Ingress with ALB Ingress Controller
+        - AWS-native controller to use ALB for K8s Ingress resources
+        - Requires alb.ingress.kubernetes.io/* annotations
+        Example Ingress:
+            apiVersion: networking.k8s.io/v1
+            kind: Ingress
+            metadata:
+              name: my-ingress
+              annotations:
+                alb.ingress.kubernetes.io/scheme: internet-facing
+                alb.ingress.kubernetes.io/target-type: ip
+            spec:
+              rules:
+                - host: myapp.example.com
+                  http:
+                    paths:
+                      - path: /
+                        pathType: Prefix
+                        backend:
+                          service:
+                            name: my-service
+                            port:
+                              number: 80
+
+
+
+    5. Security Best Practices in EKS
+        - Enable EKS OIDC provider for IRSA
+        - Use network policies (via Calico or Cilium)
+        - Enable Pod Security Standards (baseline, restricted)
+        - Limit IAM permissions via least privilege
+        - Audit logs to CloudTrail, CloudWatch
+
+
+    6. Observability
+        a. Logs
+            App Logs: stdout/stderr → FluentBit → CloudWatch or ELK
+            Control Plane Logs: Enable via EKS console
+        b. Metrics
+            Prometheus + Grafana (self-hosted or via Amazon Managed Prometheus/Grafana)
+        c. Tracing
+            Use X-Ray with Envoy (Istio) or OpenTelemetry
+
+
+    7. Deployments via Helm or ArgoCD
+        - Use Helm to deploy apps as versioned packages
+        - Use ArgoCD to GitOps your EKS cluster (auto-sync from Git to K8s)
+        Helm install:
+            helm repo add bitnami https://charts.bitnami.com/bitnami
+            helm install my-nginx bitnami/nginx
+
+
+    8. EKS Add-ons (Managed Components)
+        EKS can now manage these core components:
+            - kube-proxy
+            - CoreDNS
+            - VPC CNI plugin (responsible for pod networking)
+            - Amazon EBS CSI driver
+        You can install them from the AWS Console or via CLI:
+            aws eks create-addon --cluster-name my-cluster --addon-name vpc-cni
+
+
+
+
+    9. Common Pitfalls / Issues
+        - IP exhaustion due to VPC CNI plugin (default ENI model)
+        - Fargate cold starts are slow (~30s)
+        - Cost creep: NAT gateway, control plane, CloudWatch, etc.
+        - HPA + Cluster Autoscaler desync: HPA scales pods but CA doesn’t scale nodes quickly
+

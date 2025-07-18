@@ -1,0 +1,106 @@
+What is AWS Lambda?
+    AWS Lambda is a serverless compute service that runs your code without provisioning or managing servers.
+        - You upload code (Java, Python, Node, etc.)
+        - Lambda runs it on-demand, scaling automatically
+        - Pay only when it runs
+
+
+What is API Gateway?
+    Amazon API Gateway lets you create and expose REST, HTTP, or WebSocket APIs, backed by services like Lambda, EC2, or any HTTP endpoint.
+        - Handles routing, authentication, rate limiting, throttling, etc.
+        - Commonly used to trigger Lambda functions via HTTP
+
+
+Typical Architecture
+    [Client/Browser/Postman]
+            ↓ (HTTP)
+       API Gateway (REST)
+            ↓
+      Lambda Function (Java)
+            ↓
+          Logic (e.g., DB access)
+            ↓
+         Response (JSON, 200 OK)
+
+
+Lambda + API Gateway Real Use Case
+    Example: You want to expose an endpoint /hello that returns:
+    "Hello, Puneet!"
+
+
+Step-by-Step: Java Lambda + API Gateway
+    1. Maven Project Setup (pom.xml)
+
+    2. Lambda Handler Class
+        package com.puneet.lambda;
+
+        import com.amazonaws.services.lambda.runtime.Context;
+        import com.amazonaws.services.lambda.runtime.RequestHandler;
+        import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
+        import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
+
+        public class HelloHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+
+            @Override
+            public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent input, Context context) {
+                String name = input.getQueryStringParameters() != null
+                        ? input.getQueryStringParameters().getOrDefault("name", "World")
+                        : "World";
+
+                String message = "Hello, " + name + "!";
+
+                APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
+                response.setStatusCode(200);
+                response.setBody("{\"message\":\"" + message + "\"}");
+                response.setHeaders(Map.of("Content-Type", "application/json"));
+
+                return response;
+            }
+        }
+
+
+    3. Package & Deploy JAR
+        Package using:
+            mvn clean package
+        Your output JAR will be like lambda-hello-1.0.jar
+        You can deploy it using:
+            AWS Console (Lambda > Create function > Upload JAR)
+            Or with SAM / Terraform / CloudFormation
+
+
+
+    4. Create API Gateway
+        In AWS Console:
+            1. Go to API Gateway → Create API → REST API (HTTP/REST)
+            2. Create a /hello resource
+            3. Add a GET method
+            4. Integration type: Lambda Function
+            5. Point it to your deployed HelloHandler
+            6. Enable CORS if needed
+            7. Deploy the API to a stage (e.g., dev)
+
+
+    5. Test the API
+        Call:
+            curl "https://{api-id}.execute-api.{region}.amazonaws.com/dev/hello?name=Puneet"
+
+        Response:
+            {
+              "message": "Hello, Puneet!"
+            }
+
+
+
+Event Flow in Lambda + API Gateway
+    1. API Gateway converts HTTP request to APIGatewayProxyRequestEvent
+    2. Lambda executes Java handler
+    3. Returns APIGatewayProxyResponseEvent
+    4. API Gateway formats it into HTTP response
+
+
+Why Use Lambda + API Gateway?
+    | Benefit        | Explanation                     |
+    | -------------- | ------------------------------- |
+    | **Serverless** | No infra to manage, auto-scales |
+    | **Cheap**      | Pay-per-request                 |
+    |                |                                 |

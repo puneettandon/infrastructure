@@ -1,0 +1,78 @@
+you absolutely can use SonarQube and JIRA with CodeBuild — but it requires custom scripting, not plug-and-play like Jenkins plugins.
+
+
+Can CodeBuild integrate with:
+    | Tool          | Support | How                            |
+    | ------------- | ------- | ------------------------------ |
+    | **SonarQube** | ✅ Yes   | Using CLI and environment vars |
+    | **JIRA**      | ✅ Yes   | Using REST API or curl scripts |
+
+
+Why It's Not Like Jenkins
+    - Jenkins has plugins (e.g., SonarQube Plugin, JIRA Plugin)
+    - CodeBuild doesn't have plugins — you script everything manually in buildspec.yml
+
+
+SonarQube with CodeBuild
+    What You Need
+        - A SonarQube server (self-hosted or SonarCloud)
+        - A token for authentication
+        - Sonar Scanner CLI in your build container
+
+    Sample buildspec.yml Snippet
+        version: 0.2
+
+        phases:
+          install:
+            commands:
+              - echo Installing Sonar Scanner...
+              - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip
+              - unzip sonar-scanner-cli-*.zip
+              - export PATH=$PATH:$(pwd)/sonar-scanner-*/bin
+          build:
+            commands:
+              - echo "Running sonar scan..."
+              - sonar-scanner \
+                  -Dsonar.projectKey=myproject \
+                  -Dsonar.sources=. \
+                  -Dsonar.host.url=https://sonar.mycompany.com \
+                  -Dsonar.login=$SONAR_TOKEN
+
+
+        You pass SONAR_TOKEN using CodeBuild environment variables (secured).
+
+
+
+JIRA with CodeBuild
+    What You Can Do
+        - Create a ticket from a failed build
+        - Add comments to a ticket
+        - Transition workflow states
+
+    How to Do It
+        - Use curl + JIRA REST API
+        - Use build metadata (e.g., git commit message) to link issues
+
+
+    Sample Command in post_build
+        curl -u $JIRA_USER:$JIRA_TOKEN \
+          -X POST \
+          --data '{"body":"Build succeeded for commit abc123"}' \
+          -H "Content-Type: application/json" \
+          https://jira.mycompany.com/rest/api/2/issue/PROJ-123/comment
+
+
+
+Summary
+    | Tool            | Jenkins                   | CodeBuild                   |
+    | --------------- | ------------------------- | --------------------------- |
+    | SonarQube       | Native plugin + dashboard | CLI-based + `buildspec.yml` |
+    | JIRA            | Plugin + auto-linking     | REST API scripting          |
+    | Flexibility     | GUI-driven                | Script-driven               |
+    | Maintainability | Easier for non-devs       | Devs need to write scripts  |
+
+
+
+Recommendation
+    - For tight plugin integrations and UIs, Jenkins is smoother.
+    - For AWS-native CI with control and simplicity, CodeBuild is still powerful — just script more.

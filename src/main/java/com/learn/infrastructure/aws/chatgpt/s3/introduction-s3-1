@@ -1,7 +1,9 @@
 Amazon S3 (Simple Storage Service) - Complete Guide
 
 1️⃣ What is Amazon S3?
-    Amazon Simple Storage Service (S3) is an object storage service offered by AWS. It allows you to store and retrieve any amount of data from anywhere on the web. S3 is highly scalable, durable, and secure, making it one of the most widely used AWS services.
+    Amazon Simple Storage Service (S3) is an object storage service offered by AWS.
+    It allows you to store and retrieve any amount of data from anywhere on the web.
+    S3 is highly scalable, durable, and secure, making it one of the most widely used AWS services.
 
 2️⃣ Core Concepts of S3
     a) Buckets and Objects

@@ -1,0 +1,57 @@
+Core AWS Compute Services Overview
+
+    | Service       | Type                     | Use Case                                                       | Instance Type?            |
+    | ------------- | ------------------------ | -------------------------------------------------------------- | ------------------------- |
+    | **EC2**       | IaaS (Infrastructure)    | Full control over virtual servers                              | Yes (manual control)      |
+    | **ECS**       | CaaS                     | Container orchestration with AWS native scheduler              | Optional (EC2 or Fargate) |
+    | **EKS**       | CaaS (Kubernetes)        | Managed Kubernetes service                                     | Optional (EC2 or Fargate) |
+    | **Fargate**   | Serverless (for ECS/EKS) | Run containers without managing servers                        | No (fully abstracted)     |
+    | **Lambda**    | Serverless (FaaS)        | Run code in response to events (no server provisioning needed) | No                        |
+    | **Lightsail** | Simplified IaaS          | Simple VPS for web apps, websites, etc.                        | Yes (but limited)         |
+
+
+Concepts to Prepare
+
+    EC2 (Elastic Compute Cloud)
+        - Launching and managing instances
+        - EC2 instance types (General, Compute Optimized, etc.)
+        - Pricing: On-Demand, Reserved, Spot
+        - AMI, Security Groups, Key Pairs, EBS Volumes
+        - Auto Scaling Groups (ASG) and Elastic Load Balancer (ELB)
+        - Lifecycle: pending → running → stopping → stopped → terminated
+        - User Data and EC2 metadata
+        - Placement Groups (clustered, spread)
+
+    EKS (Elastic Kubernetes Service)
+        - Kubernetes cluster control plane managed by AWS
+        - Worker nodes on EC2 or Fargate
+        - IAM roles for service accounts (IRSA)
+        - kubectl + aws-auth ConfigMap
+        - Networking (VPC CNI plugin, security groups, ingress controller)
+        - Scaling with Cluster Autoscaler and Karpenter
+        - EKS vs ECS: K8s vs AWS-native orchestration
+
+
+    Fargate
+        - Serverless container runtime (no EC2 management)
+        - Supports ECS and EKS
+        - Billing per vCPU and memory requested
+        - Use-cases: short-lived jobs, microservices, event-driven apps
+
+
+    Lambda
+        - Event-driven, serverless functions
+        - Triggers: API Gateway, S3, DynamoDB, CloudWatch, etc.
+        - Memory and timeout limits (15 minutes max)
+        - Cold start vs warm start
+        - VPC access and concurrency limits
+        - Layers and versions
+        - Step Functions for orchestration
+
+
+
+    Other Compute Services
+        - AWS Batch: For running batch computing workloads
+        - AWS Elastic Beanstalk: PaaS for automatic deployment
+        - AWS App Runner: Simplified service to run containers directly from GitHub/ECR
+        - AWS Lightsail: Easy VPS-style instances for beginners

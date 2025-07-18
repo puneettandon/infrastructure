@@ -1,0 +1,146 @@
+                AWS Fargate
+
+What is AWS Fargate?
+    Fargate is a serverless compute engine for containers on both ECS and EKS.
+        - You define task specs or pod specs.
+        - Fargate launches and manages invisible infrastructure for you.
+        - You only pay per vCPU and memory used per second
+    No provisioning, patching, or managing EC2 instances.
+
+
+
+Why Fargate?
+    | Feature             | Traditional EC2             | Fargate                         |
+    | ------------------- | --------------------------- | ------------------------------- |
+    | Provisioning effort | You manage nodes (EC2)      | No infrastructure to manage     |
+    | Cost granularity    | Per instance-hour           | Per second (CPU + Memory)       |
+    | Scaling             | Auto Scaling Groups         | Per pod/task scaling            |
+    | Best for            | Heavy, persistent workloads | Bursty or short-lived workloads |
+    | Boot time           | Fast                        | Slower cold start (30–60s)      |
+
+
+
+Fargate in EKS vs ECS
+    | Platform | Control Plane                     | Use Fargate For                |
+    | -------- | --------------------------------- | ------------------------------ |
+    | **EKS**  | Kubernetes (you manage workloads) | Run pods in serverless mode    |
+    | **ECS**  | AWS-native                        | Run tasks/services without EC2 |
+
+
+
+
+How Fargate Works in EKS
+    - You create a Fargate Profile.
+    - It maps namespaces and labels to Fargate.
+    - Pods matching that profile will be launched on Fargate, not EC2.
+    Example Profile:
+        apiVersion: eksctl.io/v1alpha5
+        kind: ClusterConfig
+        metadata:
+          name: my-cluster
+          region: us-east-1
+
+        fargateProfiles:
+          - name: default
+            selectors:
+              - namespace: default
+
+
+
+
+Fargate Profile Key Concepts
+    | Element       | Purpose                                      |
+    | ------------- | -------------------------------------------- |
+    | **Namespace** | Only pods in this K8s namespace are eligible |
+    | **Labels**    | (Optional) Additional filtering on pods      |
+    | **IAM Role**  | Fargate pods assume this IAM role            |
+
+
+Sample Fargate Pod Deployment (EKS)
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: fargate-pod
+      namespace: default
+    spec:
+      containers:
+        - name: hello
+          image: public.ecr.aws/nginx/nginx:latest
+          ports:
+            - containerPort: 80
+
+
+
+Fargate Resource Limits
+    | Attribute | Limit                        |
+    | --------- | ---------------------------- |
+    | vCPU      | 0.25 – 4 vCPU                |
+    | Memory    | 0.5 GB – 30 GB               |
+    | Storage   | 20 GB ephemeral (by default) |
+    | Timeout   | None (runs until killed)     |
+
+
+    Fargate does not support privileged containers, daemonsets, or host networking.
+
+
+
+
+Pros of Fargate
+    - No EC2 to manage or patch
+    - Cost-efficient for short-lived or spiky workloads
+    - Ideal for multi-tenant platforms (enforce strict isolation)
+    - Good for CI jobs, cron tasks, and proof-of-concepts
+    - Fully integrated with IAM, CloudWatch, and EKS/ECS
+
+
+Cons / Limitations
+    | Limitation                            | Details                                                |
+    | ------------------------------------- | ------------------------------------------------------ |
+    | **Slow cold starts**                  | \~30–60 seconds startup latency                        |
+    | **No DaemonSets**                     | No way to run sidecars like log collectors per node    |
+    | **Limited flexibility**               | Can't use host networking, init containers, or GPU     |
+    | **Higher cost for long-running apps** | Cheaper to use EC2 for predictable, always-on services |
+    | **Pod-level granularity only**        | No control over the underlying VM node for tuning      |
+
+
+
+Common Use Cases for Fargate in EKS
+    - Running event-driven workloads
+    - API services that scale with traffic
+    - Isolated CI/CD job runners
+    - Scheduled jobs (cron pods)
+    - Multi-tenant workloads where you don’t want to co-schedule pods
+
+
+
+Example: Fargate Setup in EKS with eksctl
+    eksctl create fargateprofile \
+      --cluster my-cluster \
+      --name default-fargate \
+      --namespace default
+
+
+    Verify pods are scheduled to Fargate:
+        kubectl get pods -o wide
+        # Look for node name: starts with `fargate-ip-...`
+
+
+
+
+Fargate vs EC2 vs Lambda Quick Summary
+    | Feature      | Fargate                 | EC2                  | Lambda              |
+    | ------------ | ----------------------- | -------------------- | ------------------- |
+    | Compute type | Containers (serverless) | VMs (IaaS)           | Functions (FaaS)    |
+    | Use case     | Medium-lifecycle apps   | Stateful, heavy apps | Short-lived tasks   |
+    | Control      | Moderate                | Full control         | Minimal (just code) |
+    | Cost         | Pay-per-second          | Per hour             | Per invocation      |
+    | Boot time    | \~30s                   | Fast                 | <1s                 |
+
+
+When to Use Fargate
+    ✔️ You want serverless containers
+    ✔️ You don’t want to manage EC2
+    ✔️ You run ephemeral / batch jobs
+    ✔️ You want multi-tenant isolation
+    ✔️ You prioritize simplicity over full control
+

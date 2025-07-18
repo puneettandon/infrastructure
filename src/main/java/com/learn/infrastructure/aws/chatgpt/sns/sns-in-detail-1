@@ -1,0 +1,116 @@
+Amazon SNS (Simple Notification Service) — one of the most important event-driven messaging services in AWS.
+
+
+What is Amazon SNS?
+    SNS (Simple Notification Service) is a fully managed pub/sub messaging service that lets you send notifications or events to multiple subscribers (services, users, apps).
+    Pub/Sub model:
+        - Publishers send messages to an SNS topic
+        - Subscribers receive those messages (via Email, SMS, Lambda, SQS, HTTP, etc.)
+
+
+Key Concepts
+    | Concept               | Description                                                            |
+    | --------------------- | ---------------------------------------------------------------------- |
+    | **Topic**             | A logical access point where publishers send messages                  |
+    | **Publisher**         | Anything that sends a message to a topic (e.g., Lambda, app, API)      |
+    | **Subscriber**        | Services or endpoints that receive messages (e.g., Email, SQS, Lambda) |
+    | **Message**           | The content sent by a publisher (e.g., JSON string, alert, update)     |
+    | **Delivery Protocol** | The way messages are delivered: `email`, `SMS`, `HTTP`, `Lambda`, etc. |
+
+
+Supported SNS Subscription Types
+    | Protocol       | Example Use Case                                  |
+    | -------------- | ------------------------------------------------- |
+    | **SQS**        | Trigger asynchronous processing via queue         |
+    | **Lambda**     | Run code in response to an event                  |
+    | **HTTP/HTTPS** | Notify external webhooks (e.g., payment updates)  |
+    | **Email**      | Send user alerts or error reports                 |
+    | **SMS**        | Mobile alerts for system issues                   |
+    | **App Push**   | Mobile app notifications (via platform endpoints) |
+
+
+
+Architecture
+                     ┌──────────────┐
+                     │  Publisher   │
+                     └──────┬───────┘
+                            │
+                   ┌────────▼────────┐
+                   │   SNS Topic     │
+                   └────────┬────────┘
+            ┌───────────────┼────────────────┐
+            ▼               ▼                ▼
+       Email (user)     Lambda function     SQS Queue
+
+
+Real-World Use Cases
+    | Use Case                          | How SNS Helps                                 |
+    | --------------------------------- | --------------------------------------------- |
+    | **Order confirmation email**      | Publish to SNS → email subscriber             |
+    | **Decouple services**             | App A publishes to topic → App B gets via SQS |
+    | **Trigger Lambda on events**      | SNS → Lambda (serverless pipelines)           |
+    | **Multi-channel alerting system** | One publish = email + SMS + webhook           |
+    | **Fan-out architecture**          | One event → multiple services in parallel     |
+
+
+
+Example CLI Usage
+    1. Create Topic
+        aws sns create-topic --name order-updates
+
+    2. Subscribe Email
+        aws sns subscribe \
+          --topic-arn arn:aws:sns:us-east-1:123456789012:order-updates \
+          --protocol email \
+          --notification-endpoint you@example.com
+
+    3. Publish Message
+        aws sns publish \
+          --topic-arn arn:aws:sns:us-east-1:123456789012:order-updates \
+          --message "Order #123 has been shipped"
+
+    The subscribed email will receive the message.
+
+
+
+Message Filtering
+    You can filter messages based on message attributes, so only relevant subscribers get the message.
+            {
+              "orderType": "digital",
+              "priority": "high"
+            }
+    Subscribers can set filter policies like:
+        {
+          "orderType": ["digital"]
+        }
+
+
+Security
+    | Feature             | Description                                                |
+    | ------------------- | ---------------------------------------------------------- |
+    | **Access Control**  | Use IAM policies to allow `sns:Publish` or `sns:Subscribe` |
+    | **Encryption**      | Supports **KMS** for encrypting messages at rest           |
+    | **HTTPS Endpoints** | Use signed certificates for secure delivery                |
+
+
+
+SNS vs SQS vs EventBridge
+    | Feature           | SNS (Pub/Sub)            | SQS (Queue)                    | EventBridge                    |
+    | ----------------- | ------------------------ | ------------------------------ | ------------------------------ |
+    | Model             | Push                     | Pull                           | Event Bus                      |
+    | Use Case          | Fan-out, notify multiple | Decoupling producers/consumers | Event-driven, rule-based       |
+    | Delivery          | Push to subscribers      | Consumer pulls messages        | Push to targets based on rules |
+    | Retry/Dead-letter | No direct DLQ            | Built-in DLQ support           | Built-in DLQ support           |
+
+
+
+Summary
+    | Feature        | Value                                                |
+    | -------------- | ---------------------------------------------------- |
+    | Type           | Fully managed **pub/sub messaging service**          |
+    | Key strength   | **Fan-out**, **multi-protocol delivery**, decoupling |
+    | Common targets | Email, SMS, Lambda, SQS, HTTP endpoints              |
+    | Pricing        | **Per request**, first 1M publishes/month free tier  |
+
+
+
