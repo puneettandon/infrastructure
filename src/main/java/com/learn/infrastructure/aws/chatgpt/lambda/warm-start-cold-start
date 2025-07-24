@@ -1,0 +1,36 @@
+AWS Lambda Warm Start – Explained
+When you invoke an AWS Lambda function, it can either experience a cold start
+or a warm start depending on whether an execution environment is already available.
+
+
+Cold Start vs Warm Start
+    | Factor           | Cold Start                                               | Warm Start                               |
+    | ---------------- | -------------------------------------------------------- | ---------------------------------------- |
+    | **Startup Time** | High (100ms to several seconds)                          | Very Low (few ms)                        |
+    | **Cause**        | New container creation + code initialization             | Reuse of existing container              |
+    | **When**         | First invocation, scale-up, or after idle time (15 mins) | Subsequent invocations in same container |
+    | **Impact**       | Latency spike                                            | Fast response                            |
+
+
+What Happens During a Warm Start?
+    - Same execution environment (container) is reused.
+    - No reinitialization of your code’s static context (e.g., database clients, config).
+    - Handler is re-invoked with new event payload.
+
+
+
+How to Take Advantage of Warm Starts
+    Define reusable resources outside the handler:
+        // Initialized once per container (cold start only)
+        private static final DynamoDbClient dbClient = DynamoDbClient.create();
+
+        public String handleRequest(InputStream input, OutputStream output, Context context) {
+            // Warm start will reuse dbClient
+        }
+
+    This helps **avoid reconnecting
+
+
+
+
+
